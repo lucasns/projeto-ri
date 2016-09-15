@@ -1,6 +1,11 @@
 import cPickle as pickle
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cross_validation import train_test_split
+from sklearn.metrics import precision_score
+from sklearn.metrics import recall_score
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import f1_score
 
 LINK_FILES = ["rotten.txt", "imdb.txt", "metacritic.txt", "movies.txt", "allmovies.txt", "flixter.txt", "tribute.txt", "boxofficemojo.txt", "mubi.txt", "yifi.txt"]
 DATABASE = "database/database.pickle"
@@ -44,6 +49,17 @@ def create_TfIdf(texts):
     print "Converting the texts to feature vectors..."
     train_data_features = train_data_features.toarray()
     return (vectorizer, train_data_features)
+
+def split_dataset(X, Y):
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+    return (X_train, X_test, y_train, y_test)
+
+def evaluate(Y_true, Y_pred):
+    acc_score = accuracy_score(Y_true, Y_pred)
+    prec_score = precision_score(Y_true, Y_pred)
+    rec_score = recall_score(Y_true, Y_pred)
+    f_score = f1_score(Y_true, Y_pred)
+    return {'accuracy': acc_score, 'precision': prec_score, 'recall': rec_score, 'f1': f_score}
 
 if __name__ == '__main__':
     db = load_database()
