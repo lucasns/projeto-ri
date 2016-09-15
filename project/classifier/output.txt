@@ -1,0 +1,238 @@
+Recovering data from 'database/database.pickle'...
+Preparing the database...
+Training the Bag Of Words model...
+Converting the texts to feature vectors...
+Training the Tf Idf model...
+Converting the texts to feature vectors...
+Testing Naive Bayes:
+--------------------
+
+Training time 0.290000s
+Accuracy: 0.696970
+Precision: 0.717949
+Recall: 0.595745
+F1-Measure: 0.651163
+
+Testing Linear Regression:
+--------------------------
+
+Training time 0.394000s
+Naive score 0.818646
+R squared score -1017602717721741022461952.000000
+
+Testing Random Forests:
+-----------------------
+
+N=10
+Training time 0.035000s
+Accuracy: 0.898990
+Precision: 0.824561
+Recall: 1.000000
+F1-Measure: 0.903846
+
+N=20
+Training time 0.067000s
+Accuracy: 0.878788
+Precision: 0.807018
+Recall: 0.978723
+F1-Measure: 0.884615
+
+N=100
+Training time 0.310000s
+Accuracy: 0.898990
+Precision: 0.824561
+Recall: 1.000000
+F1-Measure: 0.903846
+
+N=200
+Training time 0.621000s
+Accuracy: 0.909091
+Precision: 0.839286
+Recall: 1.000000
+F1-Measure: 0.912621
+
+N=300
+Training time 0.994000s
+Accuracy: 0.909091
+Precision: 0.839286
+Recall: 1.000000
+F1-Measure: 0.912621
+
+N=10000
+Training time 44.828000s
+Accuracy: 0.909091
+Precision: 0.839286
+Recall: 1.000000
+F1-Measure: 0.912621
+
+Testing SVMs:
+-------------
+
+C=1, kernel=rbf
+Training time 0.519000s
+Accuracy: 0.757576
+Precision: 0.828571
+Recall: 0.617021
+F1-Measure: 0.707317
+
+C=1, kernel=linear
+Training time 0.218000s
+Accuracy: 0.696970
+Precision: 0.634921
+Recall: 0.851064
+F1-Measure: 0.727273
+
+C=1, kernel=poly
+Training time 0.346000s
+Accuracy: 0.636364
+Precision: 0.923077
+Recall: 0.255319
+F1-Measure: 0.400000
+
+C=1, kernel=sigmoid
+Training time 0.346000s
+Accuracy: 0.474747
+Precision: 0.474747
+Recall: 1.000000
+F1-Measure: 0.643836
+
+C=10, kernel=rbf
+Training time 0.334000s
+Accuracy: 0.787879
+Precision: 0.825000
+Recall: 0.702128
+F1-Measure: 0.758621
+
+C=10, kernel=linear
+Training time 0.210000s
+Accuracy: 0.727273
+Precision: 0.672414
+Recall: 0.829787
+F1-Measure: 0.742857
+
+C=10, kernel=poly
+Training time 0.295000s
+Accuracy: 0.646465
+Precision: 0.575000
+Recall: 0.978723
+F1-Measure: 0.724409
+
+C=10, kernel=sigmoid
+Training time 0.346000s
+Accuracy: 0.474747
+Precision: 0.474747
+Recall: 1.000000
+F1-Measure: 0.643836
+
+C=20, kernel=rbf
+Training time 0.330000s
+Accuracy: 0.767677
+Precision: 0.772727
+Recall: 0.723404
+F1-Measure: 0.747253
+
+C=20, kernel=linear
+Training time 0.209000s
+Accuracy: 0.727273
+Precision: 0.672414
+Recall: 0.829787
+F1-Measure: 0.742857
+
+C=20, kernel=poly
+Training time 0.317000s
+Accuracy: 0.808081
+Precision: 0.833333
+Recall: 0.744681
+F1-Measure: 0.786517
+
+C=20, kernel=sigmoid
+Training time 0.346000s
+Accuracy: 0.474747
+Precision: 0.474747
+Recall: 1.000000
+F1-Measure: 0.643836
+
+C=100, kernel=rbf
+Training time 0.324000s
+Accuracy: 0.727273
+Precision: 0.700000
+Recall: 0.744681
+F1-Measure: 0.721649
+
+C=100, kernel=linear
+Training time 0.216000s
+Accuracy: 0.727273
+Precision: 0.672414
+Recall: 0.829787
+F1-Measure: 0.742857
+
+C=100, kernel=poly
+Training time 0.312000s
+Accuracy: 0.808081
+Precision: 0.833333
+Recall: 0.744681
+F1-Measure: 0.786517
+
+C=100, kernel=sigmoid
+Training time 0.346000s
+Accuracy: 0.474747
+Precision: 0.474747
+Recall: 1.000000
+F1-Measure: 0.643836
+
+C=1000, kernel=rbf
+Training time 0.223000s
+Accuracy: 0.696970
+Precision: 0.644068
+Recall: 0.808511
+F1-Measure: 0.716981
+
+C=1000, kernel=linear
+Training time 0.210000s
+Accuracy: 0.727273
+Precision: 0.672414
+Recall: 0.829787
+F1-Measure: 0.742857
+
+C=1000, kernel=poly
+Training time 0.316000s
+Accuracy: 0.777778
+Precision: 0.777778
+Recall: 0.744681
+F1-Measure: 0.760870
+
+C=1000, kernel=sigmoid
+Training time 0.346000s
+Accuracy: 0.474747
+Precision: 0.474747
+Recall: 1.000000
+F1-Measure: 0.643836
+
+C=10000, kernel=rbf
+Training time 0.185000s
+Accuracy: 0.656566
+Precision: 0.627451
+Recall: 0.680851
+F1-Measure: 0.653061
+
+C=10000, kernel=linear
+Training time 0.182000s
+Accuracy: 0.727273
+Precision: 0.672414
+Recall: 0.829787
+F1-Measure: 0.742857
+
+C=10000, kernel=poly
+Training time 0.319000s
+Accuracy: 0.767677
+Precision: 0.750000
+Recall: 0.765957
+F1-Measure: 0.757895
+
+C=10000, kernel=sigmoid
+Training time 0.346000s
+Accuracy: 0.474747
+Precision: 0.474747
+Recall: 1.000000
+F1-Measure: 0.643836
+
