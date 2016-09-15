@@ -6,6 +6,8 @@ from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
+from sklearn.svm import SVC
+from time import time
 
 LINK_FILES = ["rotten.txt", "imdb.txt", "metacritic.txt", "movies.txt", "allmovies.txt", "flixter.txt", "tribute.txt", "boxofficemojo.txt", "mubi.txt", "yifi.txt"]
 DATABASE = "database/database.pickle"
@@ -51,7 +53,7 @@ def create_TfIdf(texts):
     return (vectorizer, train_data_features)
 
 def split_dataset(X, Y):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.33, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.33, random_state=42)
     return (X_train, X_test, y_train, y_test)
 
 def evaluate(Y_true, Y_pred):
@@ -61,8 +63,49 @@ def evaluate(Y_true, Y_pred):
     f_score = f1_score(Y_true, Y_pred)
     return {'accuracy': acc_score, 'precision': prec_score, 'recall': rec_score, 'f1': f_score}
 
+def print_scores(scores):
+    print "Accuracy: %f" % scores['accuracy']
+    print "Precision: %f" % scores['precision']
+    print "Recall: %f" % scores['recall']
+    print "F1-Measure: %f\n" % scores['f1']
+
+def try_svm(features_train, features_test, labels_train, labels_test):
+    print "Testing SVMs:"
+
+    C = [1, 10, 20, 100, 1000, 10000]
+    kernels = ['rbf', 'linear', 'poly', 'sigmoid']
+
+    for c in C:
+        for kernel in kernels:
+            print "C=%d, kernel=%s" % (c, kernel)
+
+            t0 = time()
+            clf = SVC(C=c, kernel=kernel)
+            clf.fit(features_train, labels_train)
+            print "Training time %fs" % round(time() - t0, 3)
+
+            scores = evaluate(labels_test, clf.predict(features_test))
+            print_scores(scores)
+
+def try_mlp(features_train, features_test, labels_train, labels_test):
+    #TODO
+    pass
+
+def try_random_forest(features_train, features_test, labels_train, labels_test):
+    #TODO
+    pass
+
+def try_regression(features_train, features_test, labels_train, labels_test):
+    #TODO
+    pass
+
 if __name__ == '__main__':
     db = load_database()
     X, Y = prepare_database(db)
+
     bag_of_words, bag_of_words_vectors = create_bag_of_words(X)
     tfidf, tfidf_vectors = create_TfIdf(X)
+
+    features_train, features_test, labels_train, labels_test = split_dataset(bag_of_words_vectors, Y)
+
+    try_svm(features_train, features_test, labels_train, labels_test)
