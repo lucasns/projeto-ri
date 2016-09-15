@@ -2,9 +2,17 @@ import urlparse
 import urllib
 import re
 import cPickle as pickle
+from nltk.corpus import stopwords
 from bs4 import BeautifulSoup
 
 LINK_FILES = ["rotten.txt", "imdb.txt", "metacritic.txt", "movies.txt", "allmovies.txt", "flixter.txt", "tribute.txt", "boxofficemojo.txt", "mubi.txt", "yifi.txt"]
+STOPWORDS = set(stopwords.words("english"))
+
+def clean_text(text):
+	letters_only = re.sub("[^a-zA-Z]", " ", text)
+	words = letters_only.lower().split()
+	meaningful_words = [w for w in words if not w in STOPWORDS]
+	return " ".join(meaningful_words)
 
 def extract_text(html):
 	def visible(element):
@@ -20,6 +28,7 @@ def extract_text(html):
 	all_text = ''.join(filter(visible, data))
 	text = all_text.replace('\n', ' ').replace('\r', '').strip()
 	text = ' '.join(text.split())
+	text = clean_text(text)
 
 	return text
 
@@ -58,7 +67,7 @@ def download_pages():
 	database = {}
 
 	for filename in LINK_FILES:
-		links = get_links(filename)
+		links = get_links('links/' + filename)
 		database[filename] = {'positive':[], 'negative': []}
 
 		print "> Retrieving positive pages"
