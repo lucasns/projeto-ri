@@ -1,4 +1,5 @@
 import re
+import os
 import cPickle as pickle
 from time import time
 from sklearn.feature_extraction.text import CountVectorizer
@@ -12,7 +13,10 @@ from nltk.corpus import stopwords
 from bs4 import BeautifulSoup
 
 LINK_FILES = ["rotten.txt", "imdb.txt", "metacritic.txt", "movies.txt", "allmovies.txt", "flixter.txt", "tribute.txt", "boxofficemojo.txt", "mubi.txt", "yifi.txt"]
-DATABASE = "database/database.pickle"
+
+DIR_PATH = os.path.dirname(os.path.realpath(__file__))
+DATABASE_FILE = "database/database.pickle"
+DATABASE = os.path.join(DIR_PATH, DATABASE_FILE)
 
 def clean_text(text):
 	letters_only = re.sub("[^a-zA-Z]", " ", text)
