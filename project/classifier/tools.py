@@ -13,6 +13,7 @@ from nltk.corpus import stopwords
 from bs4 import BeautifulSoup
 
 LINK_FILES = ["rotten.txt", "imdb.txt", "metacritic.txt", "movies.txt", "allmovies.txt", "flixter.txt", "tribute.txt", "boxofficemojo.txt", "mubi.txt", "yifi.txt"]
+STOPWORDS = set(stopwords.words("english"))
 
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 DATABASE_FILE = "database/database.pickle"
