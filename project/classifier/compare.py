@@ -68,6 +68,14 @@ def try_naive_bayes(features_train, features_test, labels_train, labels_test):
     scores = evaluate(labels_test, clf.predict(features_test))
     print_scores(scores)
 
+def try_ada_boost(features_train, features_test, labels_train, labels_test):
+    #TODO
+    pass
+
+def try_knn(features_train, features_test, labels_train, labels_test):
+    #TODO
+    pass
+
 def compare():
     db = load_database()
     X, Y = prepare_database(db)

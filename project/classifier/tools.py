@@ -20,22 +20,21 @@ def clean_text(text):
 	meaningful_words = [w for w in words if not w in STOPWORDS]
 	return " ".join(meaningful_words)
 
-def extract_text(html):
-	def visible(element):
-		if element.parent.name in ['style', 'script', '[document]', 'head', 'title']:
-			return False
-		elif re.match('<!--.*-->', str(element.encode('utf-8'))):
-			return False
-		else:
-			return True
+def visible(element):
+	if element.parent.name in ['style', 'script', '[document]', 'head', 'title']:
+		return False
+	elif re.match('<!--.*-->', str(element.encode('utf-8'))):
+		return False
+	else:
+		return True
 
+def extract_text(html):
 	soup = BeautifulSoup(html, 'html.parser')
 	data = soup.findAll(text=True)
 	all_text = ''.join(filter(visible, data))
 	text = all_text.replace('\n', ' ').replace('\r', '').strip()
 	text = ' '.join(text.split())
 	text = clean_text(text)
-
 	return text
 
 def load_database():
