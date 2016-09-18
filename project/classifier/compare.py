@@ -5,6 +5,8 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LinearRegression
 from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.neighbors import KNeighborsClassifier
 
 def print_scores(scores):
     print "Accuracy: %f" % scores['accuracy']
@@ -69,12 +71,38 @@ def try_naive_bayes(features_train, features_test, labels_train, labels_test):
     print_scores(scores)
 
 def try_ada_boost(features_train, features_test, labels_train, labels_test):
-    #TODO
-    pass
+    print "Testing Ada Boost:\n----------------\n"
+
+    N = [1, 5, 10, 30, 40, 100, 1000]
+    R = [0.1, 0.5, 0.7, 0.8, 0.9, 1]
+
+    for n in N:
+        for lr in R:
+            print "N=%d, learning_rate=%f" % (n, lr)
+
+            t0 = time()
+            clf = AdaBoostClassifier(n_estimators=n, learning_rate=lr)
+            clf.fit(features_train, labels_train)
+            print "Training time %fs" % round(time() - t0, 3)
+
+            scores = evaluate(labels_test, clf.predict(features_test))
+            print_scores(scores)
 
 def try_knn(features_train, features_test, labels_train, labels_test):
-    #TODO
-    pass
+    print "Testing k-NN:\n-----------\n"
+
+    N = [1, 5, 10, 20, 30, 35, 40]
+
+    for n in N:
+        print "N=%d" % n
+
+        t0 = time()
+        clf = KNeighborsClassifier(n_neighbors=n)
+        clf.fit(features_train, labels_train)
+        print "Training time %fs" % round(time() - t0, 3)
+
+        scores = evaluate(labels_test, clf.predict(features_test))
+        print_scores(scores)
 
 def compare():
     db = load_database()
@@ -91,6 +119,8 @@ def compare():
     try_regression(features_train, features_test, labels_train, labels_test)
     try_random_forest(features_train, features_test, labels_train, labels_test)
     try_svm(features_train, features_test, labels_train, labels_test)
+    try_ada_boost(features_train, features_test, labels_train, labels_test)
+    try_knn(features_train, features_test, labels_train, labels_test)
 
     print "\nUsing TF-IDF:\n=============\n"
 
@@ -100,6 +130,8 @@ def compare():
     try_regression(features_train, features_test, labels_train, labels_test)
     try_random_forest(features_train, features_test, labels_train, labels_test)
     try_svm(features_train, features_test, labels_train, labels_test)
+    try_ada_boost(features_train, features_test, labels_train, labels_test)
+    try_knn(features_train, features_test, labels_train, labels_test)
 
 if __name__ == "__main__":
     compare()
