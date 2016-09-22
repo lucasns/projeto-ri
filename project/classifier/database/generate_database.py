@@ -1,12 +1,16 @@
 import urlparse
-import urllib
+import urllib2
 import re
+import time
 import cPickle as pickle
 from nltk.corpus import stopwords
 from bs4 import BeautifulSoup
 
-LINK_FILES = ["rotten.txt", "imdb.txt", "metacritic.txt", "movies.txt", "allmovies.txt", "flixter.txt", "tribute.txt", "boxofficemojo.txt", "mubi.txt", "yifi.txt"]
+LINK_FILES = ["boxofficemojo.txt", "rotten.txt", "imdb.txt", "metacritic.txt", "movies.txt", "allmovies.txt", "flixter.txt", "tribute.txt", "mubi.txt", "yifi.txt"]
 STOPWORDS = set(stopwords.words("english"))
+
+USER_AGENT = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
+              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'}
 
 def clean_text(text):
 	letters_only = re.sub("[^a-zA-Z]", " ", text)
@@ -58,9 +62,11 @@ def get_links(filename):
 
 def get_page_content(url):
 	print "# Retrieving contents from url: %s" % url
-	page = urllib.urlopen(url)
+	page = urllib2.Request(url, headers=USER_AGENT)
+	page = urllib2.urlopen(page)
 	html_text = page.read()
 	content = extract_text(html_text)
+	time.sleep(1)
 	return content
 
 def download_pages():

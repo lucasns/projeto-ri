@@ -5,6 +5,8 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LinearRegression
 from sklearn.naive_bayes import GaussianNB
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.neighbors import KNeighborsClassifier
 
 class Classifier(object):
     def __init__(self):
@@ -17,6 +19,8 @@ class Classifier(object):
 
         self._classifier.fit(self._features_train, self._labels_train)
         self._scores = evaluate(self._labels_test, self._classifier.predict(self._features_test))
+from sklearn.ensemble import AdaBoostClassifier
+from sklearn.neighbors import KNeighborsClassifier
 
     def classify(self, html):
         text = extract_text(html)
