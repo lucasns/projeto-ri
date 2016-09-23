@@ -1,12 +1,5 @@
-import cPickle as pickle
-from time import time
 from tools import *
-from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LinearRegression
-from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import AdaBoostClassifier
-from sklearn.neighbors import KNeighborsClassifier
 
 class Classifier(object):
     def __init__(self):
