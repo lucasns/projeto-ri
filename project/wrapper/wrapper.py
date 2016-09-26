@@ -31,8 +31,8 @@ class MovieInfo(object):
                           "Title: " + str(self.title),
                           "Synopsis: " + str(self.synopsis),
                           "MPPA Rating: " + str(self.rating),
-                          "Genre: " + str(None) if self.genre is None else ", ".join(self.genre),
-                          "Director: " + str(None) if self.director is None else ", ".join(self.director),
+                          "Genre: " + (str(None) if self.genre is None else ", ".join(self.genre)),
+                          "Director: " + (str(None) if self.director is None else ", ".join(self.director)),
                           "Release Date: " + str(self.date),
                           "Box Office: " + str(self.box_office),
                           "Runtime: " +  str(self.runtime)))

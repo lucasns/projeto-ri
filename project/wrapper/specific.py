@@ -435,9 +435,9 @@ def extract_boxofficemojo(soup):
     site = "boxofficemojo"
 
     #Title
-    title = soup.find("font", size="6")
+    title = soup.find(style="padding-top: 5px;")
     if title is not None:
-        title = title.string.strip()
+        title = title.find_next("td").find_next("td").font.get_text(strip=True)
 
     #Synopsis
     
