@@ -8,6 +8,7 @@ import cPickle as pickle
 from urlparse import urljoin
 from bs4 import BeautifulSoup
 
+
 DOMAINS = {
             'rottentomatoes':   {'seed': 'https://www.rottentomatoes.com/',
                                  'robots_txt': ['license/export/', 'search', 'user', 'click',
@@ -106,17 +107,6 @@ DOMAINS = {
                                 }
         }
 
-USER_AGENT = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
-              'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'}
-
-DIR_PATH = os.path.dirname(os.path.realpath(__file__))
-FILES_FOLDER = 'files'
-FILES_PATH = os.path.join(DIR_PATH, FILES_FOLDER)
-
-if not os.path.exists(FILES_PATH):
-    os.makedirs(FILES_PATH)
-
-MAX_PAGES = 5
 
 class Crawler(threading.Thread):
     def __init__(self, website_name, website_info, use_heuristic=False):
@@ -127,68 +117,107 @@ class Crawler(threading.Thread):
         self.crawled_websites = []
         self.frontier = [website_info['seed']]
         self.visited = [website_info['seed']]
+        self.disallowed_links = [urljoin(website_info['seed'], link)
+                                 for link in website_info['robots_txt']]
+
+
+    def match_heuristic(self, url):
+        return re.match(self.website_info['movies_pattern'], url)
+    
+
+    def is_html(self, url):
+        r = requests.head(url)
+        return "text/html" in r.headers["content-type"]
+       
+     
+    def get_html(self, url):
+        user_agent = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
+                      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'}
+
+        page = urllib2.Request(url, headers=user_agent)
+        page = urllib2.urlopen(page)
+        html = page.read()
+        
+        return html
+
+    
+    def get_urls(self, html):
+        soup = BeautifulSoup(html, "lxml")
+        anchor_tags = soup.find_all('a', href=True)
+        
+        urls = [urljoin(self.website_info['seed'], link['href']) for link in anchor_tags]
+
+        urls = [u for u in urls if (self.website_info['seed'] in u and
+                                    u not in self.disallowed_links)]
+        
+        return urls
+
+
+    def run(self):
+        max_pages = 500
+
+        while len(self.frontier) > 0 and len(self.crawled_websites) < max_pages:
+            index = 0
+            if self.use_heuristic:
+                for i, url in enumerate(self.frontier):
+                    if self.match_heuristic(url):
+                        index = i
+                        break
+            
+            curr_url = self.frontier.pop(index)
+            time.sleep(self.website_info['sleep_time'])
+
+            try:
+                if not self.is_html(curr_url):
+                    continue
+                
+                html = self.get_html(curr_url)
+                
+                self.crawled_websites.append(html)
+                print(curr_url)
+
+                for url in self.get_urls(html):
+                    if url not in self.visited:
+                        self.frontier.append(url)
+                        self.visited.append(url)
+
+            except Exception,e:
+                print("\nERROR WITH URL: " + curr_url)
+                print("ERROR MESSAGE: " + str(e.message) + '\n')
+
 
     def save_crawled_pages(self, results):
         results[self.website_name] = self.crawled_websites
 
-    def expand_page(self, html_text):
-        soup = BeautifulSoup(html_text, "lxml")
 
-        # Expands the current URL to find more non-visited URLS
-        for tag in soup.findAll('a', href=True):
-            new_url = urljoin(self.website_info['seed'], tag['href'])
-            # If the new URL is allowed by the robots_txt
-            if new_url not in [urljoin(self.website_info['seed'], u) for u in self.website_info['robots_txt']]:
-                # Within the seed domain and not visited yet
-                if self.website_info['seed'] in new_url and new_url not in self.visited:
-                    if self.use_heuristic:
-                        # if it does not match the website_pattern, go to evaluate the next URL
-                        if not re.match(self.website_info['movies_pattern'], new_url):
-                            continue
+def get_files_path():
+    dir_path = os.path.dirname(os.path.realpath(__file__))
+    files_path = os.path.join(dir_path, 'files')
 
-                    self.frontier.append(new_url)
-                    self.visited.append(new_url)
+    if not os.path.exists(files_path):
+        os.makedirs(files_path)
 
-    def run(self):
-        while len(self.frontier) > 0 and len(self.crawled_websites) < MAX_PAGES:
-            current_url = self.frontier.pop(0)
+    return files_path
 
-            time.sleep(self.website_info['sleep_time'])
-
-            try:
-                page = urllib2.Request(current_url, headers=USER_AGENT)
-                page = urllib2.urlopen(page)
-                html_text = page.read()
-
-                # Checks if the type of the current URL is HTML
-                r = requests.head(current_url)
-                if "text/html" not in r.headers["content-type"]:
-                    continue
-
-                self.crawled_websites.append(html_text)
-                print(current_url)
-
-                self.expand_page(html_text)
-
-            except Exception,e:
-                print("\nERROR WITH URL: " + current_url)
-                print("ERROR MESSAGE: " + str(e.message) + '\n')
 
 def export_all_crawled_pages():
-    with open('results.pickle', 'rb') as f:
+    files_path = get_files_path()
+
+    with open(os.path.join(files_path, 'results.pickle'), 'rb') as f:
         results = pickle.load(f)
 
     for website_name, crawled_pages in results.items():
-        folder_path = os.path.join(FILES_PATH, website_name)
+        folder_path = os.path.join(files_path, website_name)
+
         if not os.path.exists(folder_path):
             os.makedirs(folder_path)
 
-        count = 1
-        for html_text in crawled_pages:
-            file_complete_name = os.path.join(folder_path, website_name+'_'+str(count)+".html")
+        for idx, html in enumerate(crawled_pages, start=1):
+            file_complete_name = os.path.join(folder_path, website_name+'_'+str(idx)+".html")
+
             with open(file_complete_name, "w") as f:
-                f.write(html_text)
-                count = count + 1
+                f.write(html)
+           
 
 def crawl():
     crawlers = []
@@ -203,8 +232,9 @@ def crawl():
         c.join()
         c.save_crawled_pages(results)
 
-    with open('results.pickle', 'wb') as f:
+    with open(os.path.join(get_files_path(), 'results.pickle'), 'wb') as f:
         pickle.dump(results, f)
+
 
 if __name__ == '__main__':
     crawl()
