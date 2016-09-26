@@ -36,3 +36,25 @@ class MovieInfo(object):
                           "Release Date: " + str(self.date),
                           "Box Office: " + str(self.box_office),
                           "Runtime: " +  str(self.runtime)))
+
+
+class Wrapper(object):
+    def __init__(self):
+        self.specfunc = {"rottentomatoes": extract_rottentomatoes,
+                         "imdb": extract_imdb,
+                         "metacritic": extract_metacritic,
+                         "movies": extract_movies,
+                         "allmovie": extract_allmovie,
+                         "flixster": extract_flixster,
+                         "tribute": extract_tribute,
+                         "boxofficemojo": extract_boxofficemojo,
+                         "mubi": extract_mubi,
+                         "yify": extract_yify}
+
+
+    def extract_specific(self, site, html):
+        soup = BeautifulSoup(html, "lxml")
+        info = self.specfunc[site](soup)
+        movie_info = MovieInfo(info)
+        return movie_info
+
