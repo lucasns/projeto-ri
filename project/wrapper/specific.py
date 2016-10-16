@@ -2,7 +2,8 @@ import re
 from bs4 import BeautifulSoup
 
 
-def extract_rottentomatoes(soup):
+def extract_rottentomatoes(html):
+    soup = BeautifulSoup(html, "lxml")
     site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
 
     #Site
@@ -65,7 +66,8 @@ def extract_rottentomatoes(soup):
     return full_info
 
 
-def extract_imdb(soup):
+def extract_imdb(html):
+    soup = BeautifulSoup(html, "lxml")
     site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
 
     #Site
@@ -142,7 +144,8 @@ def extract_imdb(soup):
     return full_info
 
 
-def extract_metacritic(soup):
+def extract_metacritic(html):
+    soup = BeautifulSoup(html, "lxml")
     site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
 
     info = soup.find(class_="summary_wrap")
@@ -201,7 +204,8 @@ def extract_metacritic(soup):
     return full_info
 
 
-def extract_movies(soup):
+def extract_movies(html):
+    soup = BeautifulSoup(html, "lxml")
     site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
 
     #Site
@@ -251,7 +255,8 @@ def extract_movies(soup):
     return full_info
 
 
-def extract_allmovie(soup):
+def extract_allmovie(html):
+    soup = BeautifulSoup(html, "lxml")
     site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
 
     details = soup.find(class_="details")
@@ -303,7 +308,8 @@ def extract_allmovie(soup):
     return full_info
 
 
-def extract_flixster(soup):
+def extract_flixster(html):
+    soup = BeautifulSoup(html, "lxml")
     site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
 
     attributes = soup.find(class_="attributes")
@@ -356,7 +362,8 @@ def extract_flixster(soup):
     return full_info
 
 
-def extract_tribute(soup):
+def extract_tribute(html):
+    soup = BeautifulSoup(html, "lxml")
     site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
      
     #Site
@@ -428,7 +435,8 @@ def _boxofficemojo_get_list(aux):
     return list
 
 
-def extract_boxofficemojo(soup):
+def extract_boxofficemojo(html):
+    soup = BeautifulSoup(html, "lxml")
     site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
       
     #Site
@@ -478,7 +486,8 @@ def extract_boxofficemojo(soup):
     return full_info
 
 
-def extract_mubi(soup):
+def extract_mubi(html):
+    soup = BeautifulSoup(html, "lxml")
     site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
 
     #Site
@@ -527,7 +536,8 @@ def extract_mubi(soup):
     return full_info
 
 
-def extract_yify(soup):
+def extract_yify(html):
+    soup = BeautifulSoup(html, "lxml")
     site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
 
     #Site

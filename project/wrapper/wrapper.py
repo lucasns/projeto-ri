@@ -14,7 +14,7 @@ class MovieInfo(object):
         self.box_office = None
         self.runtime = None
 
-        if list:
+        if info:
             self.set_info(info)
         
 
@@ -52,9 +52,8 @@ class Wrapper(object):
                          "yify": extract_yify}
 
 
-    def extract_specific(self, site, html):
-        soup = BeautifulSoup(html, "lxml")
-        info = self.specfunc[site](soup)
+    def extract_specific(self, html, site):
+        info = self.specfunc[site](html)
         movie_info = MovieInfo(info)
         return movie_info
 
