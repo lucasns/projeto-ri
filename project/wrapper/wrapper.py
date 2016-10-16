@@ -1,9 +1,10 @@
+from bs4 import BeautifulSoup
 import cPickle as pickle
 import os
 import sys
 
+from generic import *
 from specific import *
-from bs4 import BeautifulSoup
 
 
 class MovieInfo(object):
@@ -63,7 +64,18 @@ class Wrapper(object):
 
 
     def extract_generic(self, html, site):
-        movie_info = MovieInfo()
+        title = extract_title(html)
+        synopsis = extract_synopsis(html)
+        rating = extract_rating(html)
+        genre = extract_genre(html)
+        director = extract_director(html)
+        date = extract_date(html)
+        box_office = extract_boxoffice(html)
+        runtime = extract_runtime(html)
+
+        info = site, title, synopsis, rating, genre, director, date, box_office, runtime
+
+        movie_info = MovieInfo(info)
         return movie_info
 
 
@@ -88,7 +100,7 @@ def extract_all(results):
                 spec = w.extract_specific(html, site)
                 gen = w.extract_generic(html, site)
                 pickle.dump(spec, fspec, pickle.HIGHEST_PROTOCOL)
-                #pickle.dump(gen, fgen, pickle.HIGHEST_PROTOCOL)
+                pickle.dump(gen, fgen, pickle.HIGHEST_PROTOCOL)
 
 
 if __name__ == '__main__':
