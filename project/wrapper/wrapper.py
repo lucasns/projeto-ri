@@ -57,3 +57,7 @@ class Wrapper(object):
         movie_info = MovieInfo(info)
         return movie_info
 
+
+    def extract_generic(self, html, site):
+        movie_info = MovieInfo()
+        return movie_info
