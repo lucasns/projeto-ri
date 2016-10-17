@@ -24,6 +24,9 @@ def export_all_crawled_pages(filename):
             f_name = os.path.join(folder_path, page)
             with open(f_name, 'r') as pagefile:
                 results[website_name].append(pagefile.read())
+            os.remove(f_name)
+
+        os.rmdir(folder_path)
 
     with open(os.path.join(path, filename), 'wb') as f:
         pickle.dump(results, f, pickle.HIGHEST_PROTOCOL)
@@ -71,7 +74,7 @@ def save_csv(filename, rows):
 
 def run():
     crawl(True, 'using-heuristic-pages.pickle')
-    crawl(True, 'bfs-pages.pickle')
+    crawl(False, 'bfs-pages.pickle')
 
     classifier = Classifier()
 
