@@ -1,0 +1,7 @@
+beautifulsoup4
+lxml
+nltk
+numpy
+requests
+scikit-learn
+scipy
