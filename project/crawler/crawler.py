@@ -18,7 +18,7 @@ class Crawler(threading.Thread):
         self.website_info = website_info
         self.use_heuristic = use_heuristic
         self.max_pages = max_pages
-        self.crawled_websites = []
+        self.crawled_websites = 0
         self.frontier = [website_info['seed']]
         self.visited = [website_info['seed']]
         self.disallowed_links = [urljoin(website_info['seed'], link)
@@ -27,7 +27,7 @@ class Crawler(threading.Thread):
 
     def match_heuristic(self, url):
         return re.match(self.website_info['movies_pattern'], url)
-        
+
 
     def is_html(self, url):
         r = requests.head(url)
@@ -55,7 +55,7 @@ class Crawler(threading.Thread):
 
 
     def run(self):
-        while len(self.frontier) > 0 and len(self.crawled_websites) < self.max_pages:
+        while len(self.frontier) > 0 and self.crawled_websites < self.max_pages:
             index = 0
             if self.use_heuristic:
                 for i, url in enumerate(self.frontier):
@@ -72,7 +72,7 @@ class Crawler(threading.Thread):
 
                 html = self.get_html(curr_url)
 
-                self.crawled_websites.append(html)
+                self.save_crawled_page(html)
                 print(curr_url)
 
                 for url in self.get_urls(html):
@@ -85,27 +85,43 @@ class Crawler(threading.Thread):
                 print("ERROR MESSAGE: " + str(e.message) + '\n')
 
 
-    def save_crawled_pages(self, results):
-        results[self.website_name] = self.crawled_websites
+    def save_crawled_page(self, html):
+        self.crawled_websites += 1
+
+        path = FILES_PATH
+        folder_path = os.path.join(path, self.website_name)
+
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
+
+        file_complete_name = os.path.join(folder_path, self.website_name+'_'+str(self.crawled_websites)+".html")
+
+        with open(file_complete_name, "w") as f:
+            f.write(html)
 
 
 def export_all_crawled_pages():
     path = FILES_PATH
 
-    with open(os.path.join(path, 'results.pickle'), 'rb') as f:
-        results = pickle.load(f)
+    results = {}
 
-    for website_name, crawled_pages in results.items():
+    for website_name in DOMAINS.keys():
+        print(website_name)
+
         folder_path = os.path.join(path, website_name)
 
         if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
+            continue
 
-        for idx, html in enumerate(crawled_pages, start=1):
-            file_complete_name = os.path.join(folder_path, website_name+'_'+str(idx)+".html")
+        results[website_name] = []
 
-            with open(file_complete_name, "w") as f:
-                f.write(html)
+        for page in os.listdir(folder_path):
+            f_name = os.path.join(folder_path, page)
+            with open(f_name, 'r') as pagefile:
+                results[website_name].append(pagefile.read())
+
+    with open(os.path.join(path, 'results.pickle'), 'wb') as f:
+        pickle.dump(results, f, pickle.HIGHEST_PROTOCOL)
 
 
 def crawl():
@@ -115,16 +131,11 @@ def crawl():
         crawlers.append(c)
         c.start()
 
-    results = {}
-
     for c in crawlers:
         c.join()
-        c.save_crawled_pages(results)
 
-    with open(os.path.join(FILES_PATH, 'results.pickle'), 'wb') as f:
-        pickle.dump(results, f)
+    export_all_crawled_pages()
 
 
 if __name__ == '__main__':
     crawl()
-    export_all_crawled_pages()
