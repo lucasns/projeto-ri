@@ -36,7 +36,7 @@ class Crawler(threading.Thread):
 
     def get_html(self, url):
         page = urllib2.Request(url, headers=USER_AGENT)
-        page = urllib2.urlopen(page)
+        page = urllib2.urlopen(page, timeout=5)
         html = page.read()
 
         return html
