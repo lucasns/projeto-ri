@@ -12,3 +12,7 @@ test.py
 
 #Html files
 *.html
+
+#Downloaded Pages
+/project/crawler/files/*.pickle
+/project/crawler/files/*.pickle
