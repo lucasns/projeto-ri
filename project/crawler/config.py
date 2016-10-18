@@ -5,7 +5,7 @@ DOMAINS = {
                                  'robots_txt': ['license/export/', 'search', 'user', 'click',
                                                 'logout', 'trailer', 'login', 'ajax'],
                                  'sleep_time': 1,
-                                 'movies_pattern': r'https://www.rottentomatoes.com/m/.*/$'
+                                 'movies_pattern': r'https://www.rottentomatoes.com/m/[^/\?]*$'
                                 },
 
             'imdb':             {'seed': 'http://www.imdb.com/',
@@ -55,7 +55,7 @@ DOMAINS = {
                                  'movies_pattern': r'http://www.allmovie.com/movie/[^/\?]*$'
                                 },
 
-            'flixster':         {'seed': 'https://www.flixster.com/',
+            'flixster':         {'seed': 'http://www.flixster.com/',
                                  'robots_txt': ['actor/random', 'admin', 'address-book', 'api', 'bebo', 'captcha',
                                                  'converse.do', 'DoNotSend.jsp', 'facebook', 'friendsAction.do',
                                                  'friends.do', 'global-scripts', 'hi5', 'igoogle', 'invite',
@@ -66,7 +66,7 @@ DOMAINS = {
                                                  'support', 'userAuth.do', 'ad.do', 'sponsors', 'misc',
                                                  'email-content', 'static/ads', 'user/'],
                                  'sleep_time': 1,
-                                 'movies_pattern': r'https://www.flixster.com/movie/[^/\?]*$'
+                                 'movies_pattern': r'http://www.flixster.com/movie[s]?/[^/\?]*$'
                                 },
 
             'tribute':          {'seed': 'http://www.tribute.ca/',
