@@ -88,6 +88,8 @@ class Crawler(threading.Thread):
     def save_crawled_page(self, html):
         self.crawled_websites += 1
 
+        print "%s: %d" % (self.website_name.upper(), self.crawled_websites)
+
         path = FILES_PATH
         folder_path = os.path.join(path, self.website_name)
 
