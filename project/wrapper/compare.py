@@ -1,9 +1,11 @@
 import cPickle as pickle
 import csv
 import os
+import sys
 
-
+sys.path.append( os.path.dirname( os.path.dirname( os.path.abspath(__file__) ) ) )
 from wrapper import Wrapper, MovieInfo, extract_all
+from classifier.classifier import Classifier
 
 FILE_PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -152,6 +154,7 @@ def run():
 
     with open(filename, 'rb') as f:
         results = pickle.load(f)
+
 
     extract_all(results)
 
