@@ -2,7 +2,7 @@ from crawler import Crawler
 from config import *
 import cPickle as pickle
 
-def export_all_crawled_pages(filename):
+def export_all_crawled_pages(filename, delete_files=False):
     path = FILES_PATH
 
     results = {}
@@ -19,9 +19,12 @@ def export_all_crawled_pages(filename):
             f_name = os.path.join(folder_path, page)
             with open(f_name, 'r') as pagefile:
                 results[website_name].append(pagefile.read())
-            os.remove(f_name)
 
-        os.rmdir(folder_path)
+            if delete_files:
+                os.remove(f_name)
+
+        if delete_files:
+            os.rmdir(folder_path)
 
     with open(os.path.join(path, filename), 'wb') as f:
         pickle.dump(results, f, pickle.HIGHEST_PROTOCOL)
