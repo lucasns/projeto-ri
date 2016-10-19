@@ -17,7 +17,7 @@ def extract_rottentomatoes(html):
     #Synopsis
     synopsis = soup.find("div", id="movieSynopsis")
     if synopsis is not None:
-        synopsis = synopsis.string.strip()
+        synopsis = synopsis.get_text(strip=True)
 
     #Rating
     rating = soup.find(text="Rating:")
@@ -160,13 +160,15 @@ def extract_metacritic(html):
 
     #Synopsis
     synopsis = soup.find(itemprop="description")
-    if synopsis is not None:
+    if synopsis is not None and synopsis.string is not None:
         synopsis = synopsis.string.strip().replace("\n", " ")
 
     #Rating
     rating = soup.find(class_="summary_detail product_rating")
     if rating is not None:
-        rating = rating.find(itemprop="contentRating").string
+        rating = rating.find(itemprop="contentRating")
+        if rating is not None:
+            rating = rating.get_text(strip=True)
 
     #Genre
     genre = soup.find(class_="summary_detail product_genre")
@@ -219,37 +221,43 @@ def extract_movies(html):
     #Synopsis
     synopsis = soup.find(class_="segment")
     if synopsis is not None:
-        synopsis = synopsis.p.text.strip().replace("\n", " ")
-        synopsis = synopsis if "more" not in synopsis else synopsis[:len(synopsis)-4]
+        synopsis = synopsis.p
+        if synopsis is not None:
+            synopsis = synopsis.get_text().strip().replace("\n", " ")
+            #synopsis = synopsis if "more" not in synopsis else synopsis[:len(synopsis)-4]
 
 
     movie_specs = soup.find(id="movieSpecs")
     if movie_specs is not None:
         movie_specs = movie_specs.find_all("li")
+        if len(movie_specs) > 5:
+            #Rating
+            rating = movie_specs[1].find("img")
+            if rating is not None:
+                rating = rating.attrs['title'][6:].upper()
 
-        #Rating
-        rating = movie_specs[1].find("img").attrs['title']
-        if rating is not None:
-            rating = rating[6:].upper()
+            #Genre
+            genre = movie_specs[3].text.split(": ")[1]
+            if genre is not None:
+                genre = genre.split(", ")
 
-        #Genre
-        genre = movie_specs[3].text.split(": ")[1]
-        if genre is not None:
-            genre = genre.split(", ")
+            #Director
+            director = [i.string for i in movie_specs[4].find_all("a")]
 
-        #Director
-        director = [i.string for i in movie_specs[4].find_all("a")]
+            #Date
+            date = movie_specs[0].get_text().split(": ")
+            if len(date) > 1:
+                date = date[1].strip()
 
-        #Date
-        date = movie_specs[0].text.split(": ")[1].strip()
+            #Box Office
 
-        #Box Office
+            #Runtime
+            runtime = movie_specs[2].text.split(": ")
+            if len(runtime) > 1:
+                runtime = runtime[1].strip()
 
-        #Runtime
-        runtime = movie_specs[2].text.split(": ")[1].strip()
-
-        #Cast
-        cast = [i.string for i in movie_specs[5].find_all("a") if i.string not in "Full cast + crew"]
+            #Cast
+            cast = [i.string for i in movie_specs[5].find_all("a") if i.string not in "Full cast + crew"]
 
     full_info = site, title, synopsis, rating, genre, director, date, box_office, runtime
     return full_info
@@ -417,20 +425,21 @@ def extract_tribute(html):
 
 def _boxofficemojo_get_list(aux):
     aux = aux.find_next("font")
-    aux = map(lambda x: x.string, aux)
-    aux = filter(lambda x: x != ' ', aux)
-
     list = []
-    string = ""
-    for i in range(len(aux)):
-        if i == len(aux)-1:
-            string += aux[i]
-            list.append(string)
-        elif aux[i] is None:
-            list.append(string)
-            string = ""
-        else:
-            string += aux[i]
+    if aux is not None:
+        aux = map(lambda x: x.string, aux)
+        aux = filter(lambda x: x != ' ', aux)
+
+        string = ""
+        for i in range(len(aux)):
+            if aux[i] is None:
+                list.append(string)
+                string = ""
+            elif i == len(aux)-1:
+                string += aux[i]
+                list.append(string)
+            else:
+                string += aux[i]
 
     return list
 
@@ -459,8 +468,9 @@ def extract_boxofficemojo(html):
         rows = table.find_all("tr")
 
         #Rating
-        rating = rows[3].find_all("td")
-        rating = rating[0].b.string
+        if len(rows) > 3:
+            rating = rows[3].find_all("td")
+            rating = rating[0].b.string
 
         #Genre
         genre = rows[2].find_all("td")
@@ -468,11 +478,14 @@ def extract_boxofficemojo(html):
 
         #Date
         date = rows[1].find_all("td")[1]
-        date = date.find("a").string
+        date = date.find("a")
+        if date is not None:
+            date = date.string
 
         #Box Office
         box_office = rows[0].find("font", size="4")
-        box_office = box_office.b.string
+        if box_office is not None:
+            box_office = box_office.b.string
 
         #Runtime
         runtime = rows[2].find_all("td")[1].b.string
@@ -501,7 +514,9 @@ def extract_mubi(html):
     #Synopsis
     synopsis = soup.find("p", itemprop="description")
     if synopsis is not None:
-        synopsis = synopsis.string.replace("\n", " ")
+        synopsis = synopsis.string
+        if synopsis is not None:
+            synopsis = synopsis.replace("\n", " ")
 
     #Rating
 
