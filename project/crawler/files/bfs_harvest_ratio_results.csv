@@ -1,12 +1,12 @@
 Domain,# Relevant pages,# Downloaded pages,# Harvest Ratio
-flixster,83,500,0.166
-rottentomatoes,222,500,0.444
-metacritic,303,500,0.606
-mubi,129,500,0.258
-allmovie,46,500,0.092
-movies,110,500,0.22
-imdb,79,500,0.158
-tribute,92,500,0.184
+flixster,84,500,0.168
+rottentomatoes,142,500,0.284
+metacritic,305,500,0.61
+mubi,126,500,0.252
+allmovie,45,500,0.09
+movies,112,500,0.224
+imdb,82,500,0.164
+tribute,90,500,0.18
 yify,111,500,0.222
-boxofficemojo,178,500,0.356
-Total,1353,5000,0.2706
+boxofficemojo,177,500,0.354
+Total,1274,5000,0.2548
