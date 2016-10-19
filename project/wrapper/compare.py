@@ -155,6 +155,10 @@ def run():
     with open(filename, 'rb') as f:
         results = pickle.load(f)
 
+    classifier = Classifier()
+
+    for key in results.iterkeys():
+        results[key] = [r for r in results[key][:200] if classifier.classify(r)]
 
     extract_all(results)
 

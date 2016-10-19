@@ -1,0 +1,100 @@
+Media
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,52.375,16.25
+Nao Retornou Atributo,70.75,60.625
+
+Precision,0.7828774067316815
+Recall,0.4002648480995331
+Accuracy,0.565
+
+
+rating
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,35,12
+Nao Retornou Atributo,60,93
+
+Precision,0.7446808510638298
+Recall,0.3684210526315789
+Accuracy,0.64
+
+
+title
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,76,38
+Nao Retornou Atributo,83,3
+
+Precision,0.6666666666666666
+Recall,0.4779874213836478
+Accuracy,0.395
+
+
+director
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,60,4
+Nao Retornou Atributo,78,58
+
+Precision,0.9375
+Recall,0.43478260869565216
+Accuracy,0.59
+
+
+genre
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,37,4
+Nao Retornou Atributo,116,43
+
+Precision,0.9024390243902439
+Recall,0.24183006535947713
+Accuracy,0.4
+
+
+synopsis
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,26,10
+Nao Retornou Atributo,108,56
+
+Precision,0.7222222222222222
+Recall,0.19402985074626866
+Accuracy,0.41
+
+
+date
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,72,27
+Nao Retornou Atributo,75,26
+
+Precision,0.7272727272727273
+Recall,0.4897959183673469
+Accuracy,0.49
+
+
+runtime
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,109,34
+Nao Retornou Atributo,32,25
+
+Precision,0.7622377622377622
+Recall,0.7730496453900709
+Accuracy,0.67
+
+
+box_office
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,4,1
+Nao Retornou Atributo,14,181
+
+Precision,0.8
+Recall,0.2222222222222222
+Accuracy,0.925
+
+
+Media Filme
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,2.095,0.65
+Nao Retornou Atributo,2.83,2.425
+
+Precision,0.7356666666666669
+Recall,0.3339880952380953
+Accuracy,0.565
+
+
