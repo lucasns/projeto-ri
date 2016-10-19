@@ -45,7 +45,7 @@ def extract_rottentomatoes(html):
     #Date
     date = soup.find(text="In Theaters:")
     if date is not None:
-        date = date.find_next().get_text(" ", strip=True).title()
+        date = date.find_next("time").get_text(" ", strip=True).title()
 
     #Box Office
     box_office = soup.find(text="Box Office:")
@@ -95,7 +95,7 @@ def extract_imdb(html):
     #Genres
     genre = soup.find("div", itemprop="genre")
     if genre is not None:
-        genre = [i.get_text() for i in genre.find_all("a")]
+        genre = [i.get_text(strip=True) for i in genre.find_all("a")]
 
     #Details Div
     info = soup.find("div", id="titleDetails")
@@ -571,27 +571,35 @@ def extract_yify(html):
         synopsis = rows[8].text[6:].replace("\n", " ")
     
         #Rating
-        rating = rows[7].find("a").string
+        rating = rows[7].find("a")
+        if rating is not None:
+            rating = rating.string
 
         #Genre
-        genre = [i.string for i in rows[1].find_all("a")]
+        genre = [i.string for i in rows[1].find_all("a") if i is not None]
 
         #Director
-        director = [i.string for i in rows[3].find_all("a")]
+        director = [i.string for i in rows[3].find_all("a") if i is not None]
 
         #Date
-        date = rows[0].find("a").string
+        date = rows[0].find("a")
+        if date is not None:
+            date = date.string
 
         #Box Office
 
         #Cast
-        cast = [i.string for i in rows[4].find_all("a")]
+        cast = [i.string for i in rows[4].find_all("a") if i is not None]
 
         #Country
-        country = rows[5].find("a").string
+        country = rows[5].find("a")
+        if country is not None:
+            country = country.string.strip()
 
         #Language
-        language = rows[6].find("a").string
+        language = rows[6].find("a")
+        if language is not None:
+            language = language.string
 
     #Runtime
     runtime = soup.find(text=re.compile(r'Runtime:'))
