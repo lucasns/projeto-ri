@@ -1,0 +1,88 @@
+Media,,
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,93.0,13.625
+Nao Retornou Atributo,128.75,64.625
+,,
+Precision,0.8656915045980447,
+Recall,0.4273595926403526,
+Accuracy,0.5254166666666666,
+,,
+,,
+rating,,
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,58,18
+Nao Retornou Atributo,122,102
+,,
+Precision,0.7631578947368421,
+Recall,0.32222222222222224,
+Accuracy,0.5333333333333333,
+,,
+,,
+title,,
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,120,27
+Nao Retornou Atributo,153,0
+,,
+Precision,0.8163265306122449,
+Recall,0.43956043956043955,
+Accuracy,0.4,
+,,
+,,
+director,,
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,118,0
+Nao Retornou Atributo,127,55
+,,
+Precision,1.0,
+Recall,0.4816326530612245,
+Accuracy,0.5766666666666667,
+,,
+,,
+genre,,
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,60,2
+Nao Retornou Atributo,210,28
+,,
+Precision,0.967741935483871,
+Recall,0.2222222222222222,
+Accuracy,0.29333333333333333,
+,,
+,,
+synopsis,,
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,39,22
+Nao Retornou Atributo,199,40
+,,
+Precision,0.639344262295082,
+Recall,0.1638655462184874,
+Accuracy,0.2633333333333333,
+,,
+,,
+date,,
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,123,8
+Nao Retornou Atributo,141,28
+,,
+Precision,0.9389312977099237,
+Recall,0.4659090909090909,
+Accuracy,0.5033333333333333,
+,,
+,,
+runtime,,
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,199,30
+Nao Retornou Atributo,55,16
+,,
+Precision,0.868995633187773,
+Recall,0.7834645669291339,
+Accuracy,0.7166666666666667,
+,,
+,,
+box_office,,
+,Possui Atributo,Nao Possui Atributo
+Retornou Atributo,27,2
+Nao Retornou Atributo,23,248
+,,
+Precision,0.9310344827586207,
+Recall,0.54,
+Accuracy,0.9166666666666666,

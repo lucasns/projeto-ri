@@ -134,15 +134,15 @@ def compare(specresults, genresults):
 def save_csv(file, results, title, mode='wb'):
     filename = os.path.join(FILE_PATH, file + ".csv")
 
-    rows = [[title], ["", "Possui Atributo", "Nao Possui Atributo"]]
+    rows = [[title, "", ""], ["", "Possui Atributo", "Nao Possui Atributo"]]
     rows.append(["Retornou Atributo", results['TP'], results['FP']])
     rows.append(["Nao Retornou Atributo", results['FN'], results['TN']])
-    rows.append([])
-    rows.append(["Precision", results['precision']])
-    rows.append(["Recall", results['recall']])
-    rows.append(["Accuracy", results['accuracy']])
-    rows.append([])
-    rows.append([])
+    rows.append(["", "", ""])
+    rows.append(["Precision", results['precision'], ""])
+    rows.append(["Recall", results['recall']], "")
+    rows.append(["Accuracy", results['accuracy'], ""])
+    rows.append(["", "", ""])
+    rows.append(["", "", ""])
 
     with open(filename, mode) as f:
         writer = csv.writer(f)
@@ -155,6 +155,10 @@ def run():
     with open(filename, 'rb') as f:
         results = pickle.load(f)
 
+    classifier = Classifier()
+
+    for key in results.iterkeys():
+        results[key] = [r for r in results[key] if classifier.classify(r)]
 
     extract_all(results)
 
