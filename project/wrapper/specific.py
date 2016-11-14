@@ -160,8 +160,8 @@ def extract_metacritic(html):
 
     #Synopsis
     synopsis = soup.find(itemprop="description")
-    if synopsis is not None and synopsis.string is not None:
-        synopsis = synopsis.string.strip().replace("\n", " ")
+    if synopsis is not None:
+        synopsis = synopsis.get_text(strip=True).replace("\n", " ")
 
     #Rating
     rating = soup.find(class_="summary_detail product_rating")
@@ -224,8 +224,6 @@ def extract_movies(html):
         synopsis = synopsis.p
         if synopsis is not None:
             synopsis = synopsis.get_text().strip().replace("\n", " ")
-            #synopsis = synopsis if "more" not in synopsis else synopsis[:len(synopsis)-4]
-
 
     movie_specs = soup.find(id="movieSpecs")
     if movie_specs is not None:
@@ -245,17 +243,23 @@ def extract_movies(html):
             director = [i.string for i in movie_specs[4].find_all("a")]
 
             #Date
-            date = movie_specs[0].get_text().split(": ")
-            if len(date) > 1:
+            date = movie_specs[0].get_text()
+            if date:
+                date = date.split(": ")
                 date = date[1].strip()
+            else:
+                date = None
 
             #Box Office
 
             #Runtime
-            runtime = movie_specs[2].text.split(": ")
-            if len(runtime) > 1:
+            runtime = movie_specs[2].get_text()
+            if runtime:
+                runtime = runtime.split(": ")
                 runtime = runtime[1].strip()
-
+            else:
+                runtime = None
+            
             #Cast
             cast = [i.string for i in movie_specs[5].find_all("a") if i.string not in "Full cast + crew"]
 
