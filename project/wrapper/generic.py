@@ -130,7 +130,6 @@ def extract_info(html):
     soup = BeautifulSoup(html, "lxml")
 
     title = extract_title(soup)
-    synopsis = extract_synopsis(soup)
     rating = extract_rating(soup)
     genre = extract_genre(soup)
     director = extract_director(soup)
@@ -138,5 +137,5 @@ def extract_info(html):
     box_office = extract_boxoffice(soup)
     runtime = extract_runtime(soup)
 
-    info = title, synopsis, rating, genre, director, date, box_office, runtime
+    info = title, rating, genre, director, date, box_office, runtime
     return info

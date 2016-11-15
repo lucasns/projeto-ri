@@ -10,8 +10,8 @@ from specific import *
 class MovieInfo(object):
     def __init__(self, info=[]):
         self.site = None
+        self.url = None
         self.title = None
-        self.synopsis = None
         self.rating = None
         self.genre = None
         self.director = None
@@ -24,17 +24,17 @@ class MovieInfo(object):
         
 
     def get_info(self):
-        return self.site, self.title, self.synopsis, self.rating, self.genre, self.director, self.date, self.box_office, self.runtime
+        return self.site, self.url, self.title, self.rating, self.genre, self.director, self.date, self.box_office, self.runtime
 
     
     def set_info(self, info_list):
-        self.site, self.title, self.synopsis, self.rating, self.genre, self.director, self.date, self.box_office, self.runtime = info_list
+        self.site, self.url, self.title, self.rating, self.genre, self.director, self.date, self.box_office, self.runtime = info_list
 
 
     def __repr__(self):
         return "\n".join(("Site: " + str(self.site),
+                          "URL: " + str(self.url),
                           "Title: " + str(self.title),
-                          "Synopsis: " + str(self.synopsis),
                           "MPPA Rating: " + str(self.rating),
                           "Genre: " + (str(None) if self.genre is None else ", ".join(self.genre)),
                           "Director: " + (str(None) if self.director is None else ", ".join(self.director)),
@@ -71,16 +71,15 @@ class Wrapper(object):
         return tuple(r)
 
 
-    def extract_specific(self, html, site):
-        info = self.__funcs[site](html)
+    def extract_specific(self, html, site, url = None):
+        info = (site, url) + self.__funcs[site](html)
         movie_info = MovieInfo(self.__format_info(info))
         return movie_info
 
 
-    def extract_generic(self, html, site):
-        info = (site,) + self.__funcs['generic'](html)
-        info = self.__format_info(info)
-        movie_info = MovieInfo(info)
+    def extract_generic(self, html, site, url = None):
+        info = (site, url) + self.__funcs['generic'](html)
+        movie_info = MovieInfo(self.__format_info(info))
         return movie_info
 
 

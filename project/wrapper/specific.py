@@ -4,7 +4,7 @@ from bs4 import BeautifulSoup
 
 def extract_rottentomatoes(html):
     soup = BeautifulSoup(html, "lxml")
-    site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
+    title, rating, genre, director, date, box_office, runtime = [None] * 7
 
     #Site
     site = "rottentomatoes"
@@ -62,13 +62,13 @@ def extract_rottentomatoes(html):
     if studio is not None:
         studio = studio.find_next().get_text(strip=True)
     
-    full_info = site, title, synopsis, rating, genre, director, date, box_office, runtime
+    full_info = title, rating, genre, director, date, box_office, runtime
     return full_info
 
 
 def extract_imdb(html):
     soup = BeautifulSoup(html, "lxml")
-    site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
+    title, rating, genre, director, date, box_office, runtime = [None] * 7
 
     #Site
     site = "imdb"
@@ -140,13 +140,13 @@ def extract_imdb(html):
         language =  [i.get_text().strip() for i in language.parent.find_all("a")]
     
 
-    full_info = site, title, synopsis, rating, genre, director, date, box_office, runtime
+    full_info = title, rating, genre, director, date, box_office, runtime
     return full_info
 
 
 def extract_metacritic(html):
     soup = BeautifulSoup(html, "lxml")
-    site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
+    title, rating, genre, director, date, box_office, runtime = [None] * 7
 
     info = soup.find(class_="summary_wrap")
 
@@ -202,13 +202,13 @@ def extract_metacritic(html):
     if starring is not None:
         starring =  [i.string.strip() for i in starring.find_all(itemprop="name")]
 
-    full_info = site, title, synopsis, rating, genre, director, date, box_office, runtime
+    full_info = title, rating, genre, director, date, box_office, runtime
     return full_info
 
 
 def extract_movies(html):
     soup = BeautifulSoup(html, "lxml")
-    site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
+    title, rating, genre, director, date, box_office, runtime = [None] * 7
 
     #Site
     site = "movies"
@@ -263,13 +263,13 @@ def extract_movies(html):
             #Cast
             cast = [i.string for i in movie_specs[5].find_all("a") if i.string not in "Full cast + crew"]
 
-    full_info = site, title, synopsis, rating, genre, director, date, box_office, runtime
+    full_info = title, rating, genre, director, date, box_office, runtime
     return full_info
 
 
 def extract_allmovie(html):
     soup = BeautifulSoup(html, "lxml")
-    site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
+    title, rating, genre, director, date, box_office, runtime = [None] * 7
 
     details = soup.find(class_="details")
 
@@ -316,13 +316,13 @@ def extract_allmovie(html):
     if studio is not None:
         studio = studio.find_next().string
 
-    full_info = site, title, synopsis, rating, genre, director, date, box_office, runtime
+    full_info = title, rating, genre, director, date, box_office, runtime
     return full_info
 
 
 def extract_flixster(html):
     soup = BeautifulSoup(html, "lxml")
-    site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
+    title, rating, genre, director, date, box_office, runtime = [None] * 7
 
     attributes = soup.find(class_="attributes")
 
@@ -370,13 +370,13 @@ def extract_flixster(html):
     if runtime is not None:
         runtime = runtime.string
 
-    full_info = site, title, synopsis, rating, genre, director, date, box_office, runtime
+    full_info = title, rating, genre, director, date, box_office, runtime
     return full_info
 
 
 def extract_tribute(html):
     soup = BeautifulSoup(html, "lxml")
-    site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
+    title, rating, genre, director, date, box_office, runtime = [None] * 7
      
     #Site
     site = "tribute"
@@ -423,7 +423,7 @@ def extract_tribute(html):
     if studio is not None:
         studio = studio.find_next().string
 
-    full_info = site, title, synopsis, rating, genre, director, date, box_office, runtime
+    full_info = title, rating, genre, director, date, box_office, runtime
     return full_info
 
 
@@ -450,7 +450,7 @@ def _boxofficemojo_get_list(aux):
 
 def extract_boxofficemojo(html):
     soup = BeautifulSoup(html, "lxml")
-    site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
+    title, rating, genre, director, date, box_office, runtime = [None] * 7
       
     #Site
     site = "boxofficemojo"
@@ -499,13 +499,13 @@ def extract_boxofficemojo(html):
     if writer is not None:
         writer = _boxofficemojo_get_list(writer)
 
-    full_info = site, title, synopsis, rating, genre, director, date, box_office, runtime
+    full_info = title, rating, genre, director, date, box_office, runtime
     return full_info
 
 
 def extract_mubi(html):
     soup = BeautifulSoup(html, "lxml")
-    site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
+    title, rating, genre, director, date, box_office, runtime = [None] * 7
 
     #Site
     site = "mubi"
@@ -551,13 +551,13 @@ def extract_mubi(html):
     if country is not None:
         country = country.string.split(", ")[0]
 
-    full_info = site, title, synopsis, rating, genre, director, date, box_office, runtime
+    full_info = title, rating, genre, director, date, box_office, runtime
     return full_info
 
 
 def extract_yify(html):
     soup = BeautifulSoup(html, "lxml")
-    site, title, synopsis, rating, genre, director, date, box_office, runtime = [None] * 9
+    title, rating, genre, director, date, box_office, runtime = [None] * 7
 
     #Site
     site = "yify"
@@ -610,5 +610,5 @@ def extract_yify(html):
     if runtime is not None:
         runtime = runtime.split(": ")[1]
     
-    full_info = site, title, synopsis, rating, genre, director, date, box_office, runtime
+    full_info = title, rating, genre, director, date, box_office, runtime
     return full_info
