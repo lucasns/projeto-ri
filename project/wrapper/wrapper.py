@@ -45,36 +45,41 @@ class MovieInfo(object):
 
 class Wrapper(object):
     def __init__(self):
-        self.specfunc = {"rottentomatoes": extract_rottentomatoes,
-                         "imdb": extract_imdb,
-                         "metacritic": extract_metacritic,
-                         "movies": extract_movies,
-                         "allmovie": extract_allmovie,
-                         "flixster": extract_flixster,
-                         "tribute": extract_tribute,
-                         "boxofficemojo": extract_boxofficemojo,
-                         "mubi": extract_mubi,
-                         "yify": extract_yify}
+        self.__funcs = {'rottentomatoes': extract_rottentomatoes,
+                        'imdb': extract_imdb,
+                        'metacritic': extract_metacritic,
+                        'movies': extract_movies,
+                        'allmovie': extract_allmovie,
+                        'flixster': extract_flixster,
+                        'tribute': extract_tribute,
+                        'boxofficemojo': extract_boxofficemojo,
+                        'mubi': extract_mubi,
+                        'yify': extract_yify,
+                        'generic': extract_info}
+
+
+    def __format_info(self, info):
+        r = []
+        for e in info:
+            if type(e) is list:
+                e = [i.encode('utf-8') for i in e]
+            elif e is not None:
+                e = e.encode('utf-8')
+
+            r.append(e)
+
+        return tuple(r)
 
 
     def extract_specific(self, html, site):
-        info = self.specfunc[site](html)
-        movie_info = MovieInfo(info)
+        info = self.__funcs[site](html)
+        movie_info = MovieInfo(self.__format_info(info))
         return movie_info
 
 
     def extract_generic(self, html, site):
-        title = extract_title(html)
-        synopsis = extract_synopsis(html)
-        rating = extract_rating(html)
-        genre = extract_genre(html)
-        director = extract_director(html)
-        date = extract_date(html)
-        box_office = extract_boxoffice(html)
-        runtime = extract_runtime(html)
-
-        info = site, title, synopsis, rating, genre, director, date, box_office, runtime
-
+        info = (site,) + self.__funcs['generic'](html)
+        info = self.__format_info(info)
         movie_info = MovieInfo(info)
         return movie_info
 
@@ -92,13 +97,14 @@ def extract_all(results):
     with open(os.path.join(path, "specific.pickle"), 'wb') as fspec, open(os.path.join(path, "generic.pickle"), 'wb') as fgen:
         for site in results.iterkeys():
             print site
-            for i in xrange(100):
+            for i in xrange(len(results[site])):
                 html = results[site][i]
                 count += 1
                 print count
             
                 spec = w.extract_specific(html, site)
                 gen = w.extract_generic(html, site)
+                
                 pickle.dump(spec, fspec, pickle.HIGHEST_PROTOCOL)
                 pickle.dump(gen, fgen, pickle.HIGHEST_PROTOCOL)
 
