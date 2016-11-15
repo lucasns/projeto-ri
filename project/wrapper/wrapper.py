@@ -1,61 +1,29 @@
 from bs4 import BeautifulSoup
+import collections
 import cPickle as pickle
 import os
 import sys
 
-from generic import *
-from specific import *
+import generic
+import specific
 
 
-class MovieInfo(object):
-    def __init__(self, info=[]):
-        self.site = None
-        self.url = None
-        self.title = None
-        self.rating = None
-        self.genre = None
-        self.director = None
-        self.date = None
-        self.box_office = None
-        self.runtime = None
-
-        if info:
-            self.set_info(info)
-        
-
-    def get_info(self):
-        return self.site, self.url, self.title, self.rating, self.genre, self.director, self.date, self.box_office, self.runtime
-
-    
-    def set_info(self, info_list):
-        self.site, self.url, self.title, self.rating, self.genre, self.director, self.date, self.box_office, self.runtime = info_list
-
-
-    def __repr__(self):
-        return "\n".join(("Site: " + str(self.site),
-                          "URL: " + str(self.url),
-                          "Title: " + str(self.title),
-                          "MPPA Rating: " + str(self.rating),
-                          "Genre: " + (str(None) if self.genre is None else ", ".join(self.genre)),
-                          "Director: " + (str(None) if self.director is None else ", ".join(self.director)),
-                          "Release Date: " + str(self.date),
-                          "Box Office: " + str(self.box_office),
-                          "Runtime: " +  str(self.runtime)))
+MovieInfo = collections.namedtuple('MovieInfo', 'site, url, title, rating, genre, director, date, boxoffice, runtime')
 
 
 class Wrapper(object):
     def __init__(self):
-        self.__funcs = {'rottentomatoes': extract_rottentomatoes,
-                        'imdb': extract_imdb,
-                        'metacritic': extract_metacritic,
-                        'movies': extract_movies,
-                        'allmovie': extract_allmovie,
-                        'flixster': extract_flixster,
-                        'tribute': extract_tribute,
-                        'boxofficemojo': extract_boxofficemojo,
-                        'mubi': extract_mubi,
-                        'yify': extract_yify,
-                        'generic': extract_info}
+        self.__funcs = {'rottentomatoes': specific.extract_rottentomatoes,
+                        'imdb': specific.extract_imdb,
+                        'metacritic': specific.extract_metacritic,
+                        'movies': specific.extract_movies,
+                        'allmovie': specific.extract_allmovie,
+                        'flixster': specific.extract_flixster,
+                        'tribute': specific.extract_tribute,
+                        'boxofficemojo': specific.extract_boxofficemojo,
+                        'mubi': specific.extract_mubi,
+                        'yify': specific.extract_yify,
+                        'generic': generic.extract_info}
 
 
     def __format_info(self, info):
@@ -73,13 +41,13 @@ class Wrapper(object):
 
     def extract_specific(self, html, site, url = None):
         info = (site, url) + self.__funcs[site](html)
-        movie_info = MovieInfo(self.__format_info(info))
+        movie_info = MovieInfo._make(self.__format_info(info))
         return movie_info
 
 
     def extract_generic(self, html, site, url = None):
         info = (site, url) + self.__funcs['generic'](html)
-        movie_info = MovieInfo(self.__format_info(info))
+        movie_info = MovieInfo._make(self.__format_info(info))
         return movie_info
 
 
@@ -93,7 +61,7 @@ def extract_all(results):
     w = Wrapper()
         
     count = 0
-    with open(os.path.join(path, "specific.pickle"), 'wb') as fspec, open(os.path.join(path, "generic.pickle"), 'wb') as fgen:
+    with open(os.path.join(path, "../../data/specific.pickle"), 'wb') as fspec, open(os.path.join(path, "../../data/generic.pickle"), 'wb') as fgen:
         for site in results.iterkeys():
             print site
             for i in xrange(len(results[site])):
