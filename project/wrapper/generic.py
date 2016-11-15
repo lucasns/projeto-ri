@@ -17,10 +17,9 @@ def _info_type(node):
     return 'Sibling'
 
 
-def extract_title(html):
-    soup = BeautifulSoup(html, "lxml")
-    
+def extract_title(soup):
     title = soup.find(text=re.compile(r'[a-z0-9&]+[a-z0-9& ]*\([0-9]{4}\)'))
+
     if title is not None:
         title = title.string.split("(")[0]
 
@@ -33,9 +32,9 @@ def extract_title(html):
     return title
 
 
-def extract_synopsis(html):
-    soup = BeautifulSoup(html, "lxml")
+def extract_synopsis(soup):
     synopsis = soup.find(text=re.compile(r'Synops'))
+
     if synopsis is not None:
         synopsis = synopsis.find_next().get_text(strip=True).replace("\n", " ")
 
@@ -43,10 +42,9 @@ def extract_synopsis(html):
     return synopsis
 
 
-def extract_rating(html):
-    soup = BeautifulSoup(html, "lxml")
+def extract_rating(soup):
     rating = soup.find(text=re.compile(r'MPAA.*[:|-]'))
-    #print rating
+    
     if rating is None:
         rating = soup.find(text=re.compile(r'^Rating.*[:|-]'))
 
@@ -56,8 +54,7 @@ def extract_rating(html):
     return rating
 
 
-def extract_genre(html):
-    soup = BeautifulSoup(html, "lxml")
+def extract_genre(soup):
     genre = soup.find(text=re.compile(r'Genre.*[:|-]'))
     
     if genre is not None:
@@ -79,9 +76,9 @@ def extract_genre(html):
     return genre
 
 
-def extract_director(html):
-    soup = BeautifulSoup(html, "lxml")
+def extract_director(soup):
     director = soup.find(text=re.compile(r'Direct.*[:|-]'))
+
     if director is not None:
         if director.name is None:
             director = director.parent
@@ -98,8 +95,7 @@ def extract_director(html):
     return director
 
 
-def extract_date(html):
-    soup = BeautifulSoup(html, "lxml")
+def extract_date(soup):
     date = soup.find(text=re.compile(r'[a-zA-Z]+ [0-9]{1,2},? [0-9]{4}.*'))
 
     if date is None:
@@ -112,21 +108,35 @@ def extract_date(html):
     return date
 
 
-def extract_boxoffice(html):
-    soup = BeautifulSoup(html, "lxml")
+def extract_boxoffice(soup):
     box_office = soup.find(text=re.compile(r'\$[0-9]+[,|.]+[0-9]+[,|.]+[0-9]+'))
+
     if box_office is not None:
         box_office = box_office.strip()
 
     return box_office
 
 
-def extract_runtime(html):
-    soup = BeautifulSoup(html, "lxml")
+def extract_runtime(soup):
     runtime = soup.find(text=re.compile(r'[0-9]+ ?min\.?'))
-
 
     if runtime is not None:
         runtime = runtime.strip()
 
     return runtime
+
+
+def extract_info(html):
+    soup = BeautifulSoup(html, "lxml")
+
+    title = extract_title(soup)
+    synopsis = extract_synopsis(soup)
+    rating = extract_rating(soup)
+    genre = extract_genre(soup)
+    director = extract_director(soup)
+    date = extract_date(soup)
+    box_office = extract_boxoffice(soup)
+    runtime = extract_runtime(soup)
+
+    info = title, synopsis, rating, genre, director, date, box_office, runtime
+    return info
