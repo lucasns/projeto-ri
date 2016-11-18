@@ -1,3 +1,5 @@
+import os
+import sys
 import re
 import time
 import cPickle as pickle
@@ -5,6 +7,9 @@ import numpy as np
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from collections import Counter
+
+sys.path.append( os.path.dirname( os.path.dirname( os.path.abspath(__file__) ) ) )
+from wrapper.wrapper import MovieInfo
 
 class Weights(object):
     def __init__(self, index):
@@ -45,39 +50,27 @@ class NaiveWeights(Weights):
         return W
 
 class TfIdf(Weights):
-    def __init__(self, index, use_normalization=False):
-        self._normalize = use_normalization
+    def __init__(self, index):
         super(TfIdf, self).__init__(index)
 
     def _build(self):
         W = {}
         N = self._index.get_documents_number()
 
-        W_docs = {}
         for doc in xrange(N):
-            W_docs[doc] = 0
             self._lenghts[doc] = 0
 
         for term in self._index.get_terms():
             for field in self._index.get_fields():
                 postings_list = self._index.get_postings(field, term)
                 n = len(postings_list)
-                idf = np.log10(np.true_divide(N, n))
-                for (doc, freq) in postings_list:
-                    tf = 1 + np.log10(freq)
-                    w = np.multiply(tf, idf)
-                    W[(field, term, doc)] = w
-                    W_docs[doc] += w
-                    self._lenghts[doc] += 1
-
-        if self._normalize:
-            # Normalization of weights
-            for term in self._index.get_terms():
-                for field in self._index.get_fields():
-                    postings_list = self._index.get_postings(field, term)
-                    for (doc, _) in postings_list:
-                        w = W[(field, term, doc)]
-                        W[(field, term, doc)] = np.true_divide(w, np.sqrt(W_docs[doc]))
+                if n != 0:
+                    idf = np.log10(np.true_divide(N, n))
+                    for (doc, freq) in postings_list:
+                        tf = 1 + np.log10(freq)
+                        w = np.multiply(tf, idf)
+                        W[(field, term, doc)] = w
+                        self._lenghts[doc] += 1
 
         return W
 
@@ -92,14 +85,15 @@ class Search(object):
     def _format_query(self, query):
     	letters_only = re.sub("[^a-zA-Z]", " ", query)
     	words = letters_only.lower().split()
-    	meaningful_words = [self._stemmer.stem(w) for w in words if not w in STOPWORDS]
+    	meaningful_words = [self._stemmer.stem(w) for w in words if not w in self._STOPWORDS]
         freqs = Counter(meaningful_words)
         return freqs.items()
 
     def _compose_query(self, query):
         fields = self._index.get_fields()
         for f in fields:
-            query[f] = self._format_query(query[f])
+            if f in query:
+                query[f] = self._format_query(query[f])
         return query
 
     def _compute_query_weights(self, query):
@@ -108,16 +102,17 @@ class Search(object):
         fields = self._index.get_fields()
 
         for f in fields:
-            terms = query[f]
-            for (t, freq) in terms:
-                if self._tf_idf:
-                    postings_list = self._index.get_postings(field, term)
-                    n = len(postings_list)
-                    idf = np.log10(np.true_divide(N, n))
-                    tf = 1 + np.log10(freq)
-                    W[(f, t)] = np.multiply(tf, idf)
-                else:
-                    W(f, t) = 1
+            if f in query:
+                terms = query[f]
+                for (t, freq) in terms:
+                    if self._tf_idf:
+                        postings_list = self._index.get_postings(f, t)
+                        n = len(postings_list)
+                        idf = np.log10(np.true_divide(N, n))
+                        tf = 1 + np.log10(freq)
+                        W[(f, t)] = np.multiply(tf, idf)
+                    else:
+                        W[(f, t)] = 1
 
         return W
 
@@ -133,12 +128,13 @@ class Search(object):
             scores[doc] = 0
 
         for f in fields:
-            terms = query[f]
-            for (t, _) in terms:
-                w_q = query_weights[(f, t)]
-                postings_list = self._index.get_postings(f, t)
-                for (doc, _) in postings_list:
-                    scores[doc] += np.multiply(w_q, self._weights.get_weight(f, t, doc))
+            if f in query:
+                terms = query[f]
+                for (t, _) in terms:
+                    w_q = query_weights[(f, t)]
+                    postings_list = self._index.get_postings(f, t)
+                    for (doc, _) in postings_list:
+                        scores[doc] += np.multiply(w_q, self._weights.get_weight(f, t, doc))
 
         for doc in xrange(N):
             scores[doc] = np.true_divide(scores[doc], lenghts[doc])
@@ -149,3 +145,65 @@ class Search(object):
 
     def search(self, query):
         return self._rank(query)
+
+class Index(object):
+    """ Inverted index for testing purposes. """
+    def __init__(self, database):
+        self._STOPWORDS = set(stopwords.words("english"))
+        self._stemmer = PorterStemmer()
+        self._documents_number = len(database)
+        self._fields, self._terms, self._postings = self._build(database)
+
+    def _count(self, doc):
+    	letters_only = re.sub("[^a-zA-Z]", " ", doc)
+    	words = letters_only.lower().split()
+    	meaningful_words = [self._stemmer.stem(w) for w in words if not w in self._STOPWORDS]
+        freqs = Counter(meaningful_words).items()
+        tmp = [list(t) for t in zip(*freqs)]
+        if len(tmp) == 0:
+            return None, None
+        else:
+            return tmp[0], tmp[1]
+
+    def _build(self, database):
+        fields_list = list(database[0]._fields)
+        terms_list = set()
+        postings = {}
+        doc_id = 0
+
+        for doc in database:
+            doc = doc._asdict()
+            for f in fields_list:
+                if doc[f] is not None:
+                    content = doc[f]
+                    if type(doc[f]) == type([]):
+                        content = ' '.join(doc[f])
+                    terms, freqs_list = self._count(content)
+
+                    if terms is None:
+                        continue
+
+                    terms_list.update(set(terms))
+                    for (t, freq) in zip(terms, freqs_list):
+                        if (f, t) in postings:
+                            postings[(f, t)].append((doc_id, freq))
+                        else:
+                            postings[(f, t)] = [(doc_id, freq)]
+            doc_id += 1
+
+        return fields_list, terms_list, postings
+
+    def get_documents_number(self):
+        return self._documents_number
+
+    def get_terms(self):
+        return self._terms
+
+    def get_fields(self):
+        return self._fields
+
+    def get_postings(self, field, term):
+        if (field, term) in self._postings:
+            return self._postings[(field, term)]
+        else:
+            return []
