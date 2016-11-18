@@ -4,32 +4,24 @@ from crawler import Crawler
 from config import FILES_PATH
 
 
-def export_all_crawled_pages(filename, delete_files=False):
-    path = FILES_PATH
+def export_all_crawled_pages(file_path, delete_files=False):
+    with open(os.path.join(FILES_PATH, file_path), 'wb') as f:
+        for website_name in DOMAINS.keys():
+            folder_path = os.path.join(FILES_PATH, website_name)
 
-    results = {}
+            if not os.path.exists(folder_path):
+                continue
 
-    for website_name in DOMAINS.keys():
-        folder_path = os.path.join(path, website_name)
+            for page in os.listdir(folder_path):
+                f_name = os.path.join(folder_path, page)
+                with open(f_name, 'r') as pagefile:
+                    pickle.dump((website_name, pagefile.read()), f, pickle.HIGHEST_PROTOCOL)
 
-        if not os.path.exists(folder_path):
-            continue
-
-        results[website_name] = []
-
-        for page in os.listdir(folder_path):
-            f_name = os.path.join(folder_path, page)
-            with open(f_name, 'r') as pagefile:
-                results[website_name].append(pagefile.read())
+                if delete_files:
+                    os.remove(f_name)
 
             if delete_files:
-                os.remove(f_name)
-
-        if delete_files:
-            os.rmdir(folder_path)
-
-    with open(os.path.join(path, filename), 'wb') as f:
-        pickle.dump(results, f, pickle.HIGHEST_PROTOCOL)
+                os.rmdir(folder_path)
 
 
 def import_crawled_pages(filename):
@@ -39,6 +31,7 @@ def import_crawled_pages(filename):
     results = {}
     with open(filename, 'rb') as f:
         results = pickle.load(f)
+
     return results
 
 

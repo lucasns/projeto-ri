@@ -57,31 +57,36 @@ def read_file(file):
     return content
 
 
-def extract_all(results):
-    path = os.path.dirname(os.path.realpath(__file__))
+def read_file_multiple(file_path):
+    with open(file_path, 'rb') as f:
+        while True:
+            try:
+                yield pickle.load(f)
+            except EOFError:
+                break
 
-    w = Wrapper()
+
+def extract_info_file(in_path, out_path, extract_type='specific'):
+    wrapper = Wrapper()
+
+    if extract_type == 'generic':
+        extract_funtion = wrapper.extract_generic
+    else:
+        extract_funtion = wrapper.extract_specific
+    
+    with open(out_path, 'wb') as f:
+        info_list = []
+        for site, html in read_file_multiple(in_path):
+            info = extract_funtion(html, site)
+            info_list.append(info)
         
-    count = 0
-    with open(os.path.join(path, "../../data/specific.pickle"), 'wb') as fspec, open(os.path.join(path, "../../data/generic.pickle"), 'wb') as fgen:
-        for site in results.iterkeys():
-            for i in xrange(len(results[site])):
-                html = results[site][i]
-                count += 1
-                print site + " " + str(count)
-            
-                spec = w.extract_specific(html, site)
-                gen = w.extract_generic(html, site)
-                
-                pickle.dump(spec, fspec, pickle.HIGHEST_PROTOCOL)
-                pickle.dump(gen, fgen, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(info_list, f, pickle.HIGHEST_PROTOCOL)
+
 
 
 if __name__ == '__main__':
     path = os.path.dirname(os.path.realpath(__file__))
-    results = {}
 
-    with open(os.path.join(path, "classified_pages.pickle"), 'rb') as f:
-        results = pickle.load(f)
+    extract_info_file(os.path.join(path, "../../data/classified_pages.pickle"), os.path.join(path, "../../data/specific.pickle"))
+    extract_info_file(os.path.join(path, "../../data/classified_pages.pickle"), os.path.join(path, "../../data/generic.pickle"), 'generic')
  
-    extract_all(results)
