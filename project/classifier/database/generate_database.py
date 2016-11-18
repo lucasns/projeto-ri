@@ -32,7 +32,7 @@ def extract_text(html):
 			return True
 
 	soup = BeautifulSoup(html, 'html.parser')
-	data = soup.findAll(text=True)
+	data = soup.find_all(text=True)
 	all_text = ''.join(filter(visible, data))
 	text = all_text.replace('\n', ' ').replace('\r', '').strip()
 	text = ' '.join(text.split())

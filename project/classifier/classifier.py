@@ -24,28 +24,3 @@ class Classifier(object):
     def get_scores(self):
         return self._scores
 
-
-def _test():
-    import urllib2
-
-    USER_AGENT = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
-                  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'}
-
-    url = 'https://www.rottentomatoes.com/m/tideland'
-    page = urllib2.Request(url, headers=USER_AGENT)
-    page = urllib2.urlopen(page)
-    html_text = page.read()
-
-    clf = Classifier()
-    scores = clf.get_scores()
-    result = 'Is relevant' if clf.classify(html_text) == 1 else 'Is not relevant'
-
-    print "Accuracy: %f" % scores['accuracy']
-    print "Precision: %f" % scores['precision']
-    print "Recall: %f" % scores['recall']
-    print "F1-Measure: %f" % scores['f1']
-
-    print "\nResult for url %s: '%s'" % (url, result)
-
-if __name__ == '__main__':
-    _test()

@@ -13,9 +13,8 @@ from bs4 import BeautifulSoup
 LINK_FILES = ["rotten.txt", "imdb.txt", "metacritic.txt", "movies.txt", "allmovies.txt", "flixter.txt", "tribute.txt", "boxofficemojo.txt", "mubi.txt", "yifi.txt"]
 STOPWORDS = set(stopwords.words("english"))
 
-DIR_PATH = os.path.dirname(os.path.realpath(__file__))
-DATABASE_FILE = "database/database.pickle"
-DATABASE = os.path.join(DIR_PATH, DATABASE_FILE)
+DIR_PATH = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'database')
+DATABASE = os.path.join(DIR_PATH, 'database.pickle')
 
 
 def _clean_text(text):

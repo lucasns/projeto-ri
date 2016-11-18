@@ -95,3 +95,36 @@ class Crawler(threading.Thread):
 
         with open(file_complete_name, "w") as f:
             f.write(html)
+
+
+def _export_crawled_pages(file_path, delete_files=False):
+    with open(os.path.join(file_path), 'wb') as f:
+        for website_name in DOMAINS.keys():
+            folder_path = os.path.join(FILES_PATH, website_name)
+
+            if not os.path.exists(folder_path):
+                continue
+
+            for page in os.listdir(folder_path):
+                f_name = os.path.join(folder_path, page)
+                with open(f_name, 'r') as pagefile:
+                    pickle.dump((website_name, pagefile.read()), f, pickle.HIGHEST_PROTOCOL)
+
+                if delete_files:
+                    os.remove(f_name)
+
+            if delete_files:
+                os.rmdir(folder_path)
+
+
+def crawl_domain(use_heuristic, file_path):
+    crawlers = []
+    for website_name, website_info in DOMAINS.iteritems():
+        c = Crawler(website_name, website_info, 500, use_heuristic=use_heuristic)
+        crawlers.append(c)
+        c.start()
+
+    for c in crawlers:
+        c.join()
+
+    _export_crawled_pages(file_path)

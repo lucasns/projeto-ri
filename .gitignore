@@ -7,8 +7,9 @@ __pycache__/
 venv/
 ENV/
 
-#Test file
+#Test files
 test.py
+test.pickle
 
 #Html files
 *.html
@@ -16,3 +17,6 @@ test.py
 #Downloaded Pages
 /project/crawler/files/*.pickle
 /project/crawler/files/*.pickle
+
+#Data
+/data
