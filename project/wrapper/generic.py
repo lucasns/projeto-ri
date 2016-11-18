@@ -1,5 +1,6 @@
-from bs4 import BeautifulSoup
 import re
+
+from bs4 import BeautifulSoup
 
 
 def _info_type(node):
@@ -22,7 +23,6 @@ def extract_title(soup):
 
     if title is not None:
         title = title.string.split("(")[0]
-
     else:
         title = soup.find("h1")
 
@@ -70,7 +70,6 @@ def extract_genre(soup):
         elif position == 'Sibling':
             genre = [x.string.strip() for x in genre.find_next_siblings() if x.string is not None]
 
-
         genre = [x for x in genre if x != "," and x != "|"]
 
     return genre
@@ -100,7 +99,6 @@ def extract_date(soup):
 
     if date is None:
         date = soup.find(text=re.compile(r'[0-9]{1,2} [a-zA-Z]+,? [0-9]{4}.*'))
-
 
     if date is not None:
         date = date.strip()

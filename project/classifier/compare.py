@@ -2,7 +2,7 @@ import csv
 import os
 import cPickle as pickle
 from time import time
-from tools import *
+
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LinearRegression
@@ -10,12 +10,17 @@ from sklearn.naive_bayes import GaussianNB
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.neighbors import KNeighborsClassifier
 
+import tools
+
+
 DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 RESULTS_PATH = os.path.join(DIR_PATH, 'results')
+
 
 def list_scores(scores):
     res = [scores['accuracy'], scores['precision'], scores['recall'], scores['f1']]
     return res
+
 
 def try_svm(features_train, features_test, labels_train, labels_test):
     C = [1, 10, 20, 100, 1000, 10000]
@@ -32,11 +37,12 @@ def try_svm(features_train, features_test, labels_train, labels_test):
             clf.fit(features_train, labels_train)
             training_time = "%fs" % round(time() - t0, 3)
 
-            scores = evaluate(labels_test, clf.predict(features_test))
+            scores = tools.evaluate(labels_test, clf.predict(features_test))
 
             rows.append([alg_name, training_time] + list_scores(scores))
 
     return rows
+
 
 def try_random_forest(features_train, features_test, labels_train, labels_test):
     N = [10, 20, 100, 200, 300, 10000]
@@ -51,10 +57,11 @@ def try_random_forest(features_train, features_test, labels_train, labels_test):
         clf.fit(features_train, labels_train)
         training_time = "%fs" % round(time() - t0, 3)
 
-        scores = evaluate(labels_test, clf.predict(features_test))
+        scores = tools.evaluate(labels_test, clf.predict(features_test))
         rows.append([alg_name, training_time] + list_scores(scores))
 
     return rows
+
 
 def try_regression(features_train, features_test, labels_train, labels_test):
     alg_name = "Linear Regression"
@@ -68,6 +75,7 @@ def try_regression(features_train, features_test, labels_train, labels_test):
 
     return rows
 
+
 def try_naive_bayes(features_train, features_test, labels_train, labels_test):
     alg_name = "Naive Bayes"
 
@@ -76,11 +84,12 @@ def try_naive_bayes(features_train, features_test, labels_train, labels_test):
     clf.fit(features_train, labels_train)
     training_time = "%fs" % round(time() - t0, 3)
 
-    scores = evaluate(labels_test, clf.predict(features_test))
+    scores = tools.evaluate(labels_test, clf.predict(features_test))
 
     rows = [[alg_name, training_time] + list_scores(scores)]
 
     return rows
+
 
 def try_ada_boost(features_train, features_test, labels_train, labels_test):
     N = [1, 5, 10, 30, 40, 100, 1000]
@@ -97,11 +106,12 @@ def try_ada_boost(features_train, features_test, labels_train, labels_test):
             clf.fit(features_train, labels_train)
             training_time = "%fs" % round(time() - t0, 3)
 
-            scores = evaluate(labels_test, clf.predict(features_test))
+            scores = tools.evaluate(labels_test, clf.predict(features_test))
 
             rows.append([alg_name, training_time] + list_scores(scores))
 
     return rows
+
 
 def try_knn(features_train, features_test, labels_train, labels_test):
     N = [1, 5, 10, 20, 30, 35, 40]
@@ -116,10 +126,11 @@ def try_knn(features_train, features_test, labels_train, labels_test):
         clf.fit(features_train, labels_train)
         training_time = "%fs" % round(time() - t0, 3)
 
-        scores = evaluate(labels_test, clf.predict(features_test))
+        scores = tools.evaluate(labels_test, clf.predict(features_test))
         rows.append([alg_name, training_time] + list_scores(scores))
 
     return rows
+
 
 def save_csv(filename, rows):
     if not os.path.exists(RESULTS_PATH):
@@ -130,19 +141,20 @@ def save_csv(filename, rows):
         writer = csv.writer(f)
         writer.writerows(rows)
 
-def compare():
-    db = load_database()
-    X, Y = prepare_database(db)
 
-    bag_of_words, bag_of_words_vectors = create_bag_of_words(X)
-    tfidf, tfidf_vectors = create_TfIdf(X)
+def compare_classifiers():
+    db = tools.load_database()
+    X, Y = tools.prepare_database(db)
+
+    bag_of_words, bag_of_words_vectors = tools.create_bag_of_words(X)
+    tfidf, tfidf_vectors = tools.create_TfIdf(X)
 
     print "Testing Bag of Words"
 
     filename = "bag-of-words-results"
     rows = [['Algorithm', 'Training Time', 'Accuracy', 'Precision', 'Recall', 'F1-Measure']]
 
-    features_train, features_test, labels_train, labels_test = split_dataset(bag_of_words_vectors, Y)
+    features_train, features_test, labels_train, labels_test = tools.split_dataset(bag_of_words_vectors, Y)
 
     rows += try_naive_bayes(features_train, features_test, labels_train, labels_test)
     rows += try_regression(features_train, features_test, labels_train, labels_test)
@@ -158,7 +170,7 @@ def compare():
     filename = "tf-idf-results"
     rows = [['Algorithm', 'Training Time', 'Accuracy', 'Precision', 'Recall', 'F1-Measure']]
 
-    features_train, features_test, labels_train, labels_test = split_dataset(tfidf_vectors, Y)
+    features_train, features_test, labels_train, labels_test = tools.split_dataset(tfidf_vectors, Y)
 
     rows += try_naive_bayes(features_train, features_test, labels_train, labels_test)
     rows += try_regression(features_train, features_test, labels_train, labels_test)
@@ -169,5 +181,6 @@ def compare():
 
     save_csv(filename, rows)
 
+
 if __name__ == "__main__":
-    compare()
+    compare_classifiers()

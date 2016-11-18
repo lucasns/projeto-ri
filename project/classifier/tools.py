@@ -2,15 +2,13 @@ import re
 import os
 import cPickle as pickle
 from time import time
-from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.feature_extraction.text import TfidfVectorizer
+
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.cross_validation import train_test_split
-from sklearn.metrics import precision_score
-from sklearn.metrics import recall_score
-from sklearn.metrics import accuracy_score
-from sklearn.metrics import f1_score
+from sklearn.metrics import precision_score, recall_score, accuracy_score, f1_score
 from nltk.corpus import stopwords
 from bs4 import BeautifulSoup
+
 
 LINK_FILES = ["rotten.txt", "imdb.txt", "metacritic.txt", "movies.txt", "allmovies.txt", "flixter.txt", "tribute.txt", "boxofficemojo.txt", "mubi.txt", "yifi.txt"]
 STOPWORDS = set(stopwords.words("english"))
@@ -19,13 +17,15 @@ DIR_PATH = os.path.dirname(os.path.realpath(__file__))
 DATABASE_FILE = "database/database.pickle"
 DATABASE = os.path.join(DIR_PATH, DATABASE_FILE)
 
-def clean_text(text):
+
+def _clean_text(text):
 	letters_only = re.sub("[^a-zA-Z]", " ", text)
 	words = letters_only.lower().split()
 	meaningful_words = [w for w in words if not w in STOPWORDS]
 	return " ".join(meaningful_words)
 
-def visible(element):
+
+def _visible(element):
 	if element.parent.name in ['style', 'script', '[document]', 'head', 'title']:
 		return False
 	elif re.match('<!--.*-->', str(element.encode('utf-8'))):
@@ -33,14 +33,16 @@ def visible(element):
 	else:
 		return True
 
+
 def extract_text(html):
 	soup = BeautifulSoup(html, 'html.parser')
-	data = soup.findAll(text=True)
-	all_text = ''.join(filter(visible, data))
+	data = soup.find_all(text=True)
+	all_text = ''.join(filter(_visible, data))
 	text = all_text.replace('\n', ' ').replace('\r', '').strip()
 	text = ' '.join(text.split())
-	text = clean_text(text)
+	text = _clean_text(text)
 	return text
+
 
 def load_database():
     print "Recovering data from '%s'..." % DATABASE
@@ -48,6 +50,7 @@ def load_database():
     db = pickle.load(f)
     f.close()
     return db
+
 
 def prepare_database(database):
     print "Preparing the database..."
@@ -64,7 +67,8 @@ def prepare_database(database):
             X.append(text)
             Y.append(0)
 
-    return (X, Y)
+    return X, Y
+
 
 def create_bag_of_words(texts):
     vectorizer = CountVectorizer(analyzer = "word", tokenizer = None, preprocessor = None, stop_words = None, max_features = 5000)
@@ -72,7 +76,8 @@ def create_bag_of_words(texts):
     train_data_features = vectorizer.fit_transform(texts)
     print "Converting the texts to feature vectors..."
     train_data_features = train_data_features.toarray()
-    return (vectorizer, train_data_features)
+    return vectorizer, train_data_features
+
 
 def create_TfIdf(texts):
     vectorizer = TfidfVectorizer(analyzer = "word", tokenizer = None, preprocessor = None, stop_words = None, max_features = 5000)
@@ -80,11 +85,13 @@ def create_TfIdf(texts):
     train_data_features = vectorizer.fit_transform(texts)
     print "Converting the texts to feature vectors..."
     train_data_features = train_data_features.toarray()
-    return (vectorizer, train_data_features)
+    return vectorizer, train_data_features
+
 
 def split_dataset(X, Y):
     X_train, X_test, y_train, y_test = train_test_split(X, Y, test_size=0.33, random_state=42)
-    return (X_train, X_test, y_train, y_test)
+    return X_train, X_test, y_train, y_test
+
 
 def evaluate(Y_true, Y_pred):
     acc_score = accuracy_score(Y_true, Y_pred)

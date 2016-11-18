@@ -1,6 +1,8 @@
-from crawler import Crawler
-from config import *
 import cPickle as pickle
+
+from crawler import Crawler
+from config import FILES_PATH
+
 
 def export_all_crawled_pages(filename, delete_files=False):
     path = FILES_PATH
@@ -29,6 +31,7 @@ def export_all_crawled_pages(filename, delete_files=False):
     with open(os.path.join(path, filename), 'wb') as f:
         pickle.dump(results, f, pickle.HIGHEST_PROTOCOL)
 
+
 def import_crawled_pages(filename):
     path = FILES_PATH
     filename = os.path.join(path, filename)
@@ -37,6 +40,7 @@ def import_crawled_pages(filename):
     with open(filename, 'rb') as f:
         results = pickle.load(f)
     return results
+
 
 def crawl(use_heuristic, filename):
     crawlers = []

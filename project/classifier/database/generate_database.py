@@ -3,8 +3,10 @@ import urllib2
 import re
 import time
 import cPickle as pickle
+
 from nltk.corpus import stopwords
 from bs4 import BeautifulSoup
+
 
 LINK_FILES = ["boxofficemojo.txt", "rotten.txt", "imdb.txt", "metacritic.txt", "movies.txt", "allmovies.txt", "flixter.txt", "tribute.txt", "mubi.txt", "yifi.txt"]
 STOPWORDS = set(stopwords.words("english"))
@@ -12,11 +14,13 @@ STOPWORDS = set(stopwords.words("english"))
 USER_AGENT = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.11 (KHTML, like Gecko) Chrome/23.0.1271.64 Safari/537.11',
               'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'}
 
+
 def clean_text(text):
 	letters_only = re.sub("[^a-zA-Z]", " ", text)
 	words = letters_only.lower().split()
 	meaningful_words = [w for w in words if not w in STOPWORDS]
 	return " ".join(meaningful_words)
+
 
 def extract_text(html):
 	def visible(element):
@@ -36,11 +40,13 @@ def extract_text(html):
 
 	return text
 
+
 def format_link(url):
 	if url[-1] == '\n':
 		return url[:-1]
 	else:
 		return url
+
 
 def get_links(filename):
 	print "Reading links from file '%s'" % filename
@@ -60,6 +66,8 @@ def get_links(filename):
 
 	return links
 
+
+
 def get_page_content(url):
 	print "# Retrieving contents from url: %s" % url
 	page = urllib2.Request(url, headers=USER_AGENT)
@@ -68,6 +76,7 @@ def get_page_content(url):
 	content = extract_text(html_text)
 	time.sleep(1)
 	return content
+
 
 def download_pages():
 	database = {}
@@ -89,6 +98,7 @@ def download_pages():
 	db_file = open('database.pickle', 'wb')
 	pickle.dump(database, db_file, pickle.HIGHEST_PROTOCOL)
 	db_file.close()
+
 
 if __name__ == '__main__':
 	download_pages()

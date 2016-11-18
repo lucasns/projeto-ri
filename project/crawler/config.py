@@ -1,5 +1,6 @@
 import os
 
+
 DOMAINS = {
             'rottentomatoes':   {'seed': 'https://www.rottentomatoes.com/',
                                  'robots_txt': ['license/export/', 'search', 'user', 'click',

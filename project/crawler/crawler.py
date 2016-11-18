@@ -1,4 +1,3 @@
-from bs4 import BeautifulSoup
 import cPickle as pickle
 import re
 import requests
@@ -7,6 +6,8 @@ import threading
 import time
 import urllib2
 from urlparse import urljoin
+
+from bs4 import BeautifulSoup
 
 from config import DOMAINS, USER_AGENT, FILES_PATH
 
@@ -19,29 +20,25 @@ class Crawler(threading.Thread):
         self.use_heuristic = use_heuristic
         self.max_pages = max_pages
         self.crawled_websites = 0
-        self.frontier = [website_info['seed']]
-        self.visited = [website_info['seed']]
+        self._frontier = [website_info['seed']]
+        self._visited = [website_info['seed']]
         self.disallowed_links = [urljoin(website_info['seed'], link)
                                  for link in website_info['robots_txt']]
-
-
+        
     def match_heuristic(self, url):
         return re.match(self.website_info['movies_pattern'], url)
-
-
+    
     def is_html(self, url):
         r = requests.head(url)
         return "text/html" in r.headers["content-type"]
-
-
+    
     def get_html(self, url):
         page = urllib2.Request(url, headers=USER_AGENT)
         page = urllib2.urlopen(page, timeout=5)
         html = page.read()
 
         return html
-
-
+    
     def get_urls(self, html):
         soup = BeautifulSoup(html, "lxml")
         anchor_tags = soup.find_all('a', href=True)
@@ -52,18 +49,17 @@ class Crawler(threading.Thread):
                                     u not in self.disallowed_links)]
 
         return urls
-
-
+    
     def run(self):
-        while len(self.frontier) > 0 and self.crawled_websites < self.max_pages:
+        while len(self._frontier) > 0 and self.crawled_websites < self.max_pages:
             index = 0
             if self.use_heuristic:
-                for i, url in enumerate(self.frontier):
+                for i, url in enumerate(self._frontier):
                     if self.match_heuristic(url):
                         index = i
                         break
 
-            curr_url = self.frontier.pop(index)
+            curr_url = self._frontier.pop(index)
             time.sleep(self.website_info['sleep_time'])
 
             try:
@@ -76,14 +72,13 @@ class Crawler(threading.Thread):
                 print(curr_url)
 
                 for url in self.get_urls(html):
-                    if url not in self.visited:
-                        self.frontier.append(url)
-                        self.visited.append(url)
+                    if url not in self._visited:
+                        self._frontier.append(url)
+                        self._visited.append(url)
 
             except Exception,e:
                 print("\nERROR WITH URL: " + curr_url)
                 print("ERROR MESSAGE: " + str(e.message) + '\n')
-
 
     def save_crawled_page(self, html):
         self.crawled_websites += 1

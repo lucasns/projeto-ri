@@ -1,8 +1,9 @@
-from bs4 import BeautifulSoup
 import collections
 import cPickle as pickle
 import os
 import sys
+
+from bs4 import BeautifulSoup
 
 import generic
 import specific
@@ -25,7 +26,6 @@ class Wrapper(object):
                         'yify': specific.extract_yify,
                         'generic': generic.extract_info}
 
-
     def _format_info(self, info):
         r = []
         for e in info:
@@ -38,12 +38,10 @@ class Wrapper(object):
 
         return tuple(r)
 
-
     def extract_specific(self, html, site, url = None):
         info = (site, url) + self._funcs[site](html)
         movie_info = MovieInfo._make(self._format_info(info))
         return movie_info
-
 
     def extract_generic(self, html, site, url = None):
         info = (site, url) + self._funcs['generic'](html)
@@ -85,5 +83,5 @@ if __name__ == '__main__':
 
     with open(os.path.join(path, "classified_pages.pickle"), 'rb') as f:
         results = pickle.load(f)
-
+ 
     extract_all(results)

@@ -83,8 +83,8 @@ def extraction_score(specresults, genresults):
     return results
  
 
-def save_csv(file, rows):
-    with open(file, 'wb') as f:
+def save_csv(file_path, rows):
+    with open(file_path, 'wb') as f:
         writer = csv.writer(f)
         writer.writerows(rows)
 

@@ -1,7 +1,9 @@
-from tools import *
 import csv
 import os
 import sys
+
+from tools import import_crawled_pages, crawl
+
 
 sys.path.append( os.path.dirname( os.path.dirname( os.path.abspath(__file__) ) ) )
 from classifier.classifier import Classifier
