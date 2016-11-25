@@ -28,11 +28,13 @@ def extract_all_info(in_path, out_path, extract_type='specific'):
         extract_funtion = wrapper.extract_generic
     else:
         extract_funtion = wrapper.extract_specific
+
+    info_list = []
+    for site, html in read_file_multiple(in_path):
+        info_list.append(extract_funtion(html, site))
     
     with open(out_path, 'wb') as f:
-        for site, html in read_file_multiple(in_path):
-            info = extract_funtion(html, site)
-            pickle.dump(info, f, pickle.HIGHEST_PROTOCOL)
+        pickle.dump(info_list, f, pickle.HIGHEST_PROTOCOL)
 
 
 def create_data():

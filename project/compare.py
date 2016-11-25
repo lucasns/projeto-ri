@@ -297,10 +297,10 @@ def compare_wrapper():
     generic_path = os.path.join(DATA_DIR, "generic.pickle")
 
     if not os.path.exists(specific_path):
-        extract_info_file(CLASSIFIED_PAGES_PATH, specific_path)
+        extract_all_info(CLASSIFIED_PAGES_PATH, specific_path)
 
     if not os.path.exists(generic_path):
-        extract_info_file(CLASSIFIED_PAGES_PATH, generic_path)
+        extract_all_info(CLASSIFIED_PAGES_PATH, generic_path)
 
     specresults = read_file(specific_path)
     genresults = read_file(generic_path)
@@ -332,4 +332,4 @@ if __name__ == '__main__':
 
     compare_classifiers()
     compare_crawler()
-    compare_crawler()
+    compare_wrapper()
