@@ -9,7 +9,7 @@ from stop_words import get_stop_words
 
 def tokenize(str):
     stop_words = get_stop_words('english')
-    letters_only = re.sub("[^a-zA-Z\-]", " ", str)
+    letters_only = re.sub("[^a-zA-Z0-9]", " ", str)
     words = letters_only.lower().split()
     words = [w for w in words if not w in stop_words]
     words = [stem(w) for w in words]
@@ -19,7 +19,7 @@ def tokenize(str):
 class MatrixTD(object):
     def _extract_terms(self, documents):
         terms = []
-        for id, info in enumerate(documents, 1):
+        for id, info in documents.iteritems():
             for field in info.iterkeys():
                 if info[field]:
                     words = tokenize(info[field])
@@ -49,7 +49,7 @@ class BasicIndex(object):
 
     def _extract_terms(self, documents=True):
         terms = []
-        for id, info in enumerate(documents, 1):
+        for id, info in documents.iteritems():
             for field in info.iterkeys():
                 if info[field]:
                     words = tokenize(info[field])
@@ -92,7 +92,7 @@ class FrequencyIndex(object):
 
     def _extract_terms(self, documents):
         terms = []
-        for id, info in enumerate(documents, 1):
+        for id, info in documents.iteritems():
             for field in info.iterkeys():
                 if info[field]:
                     words = tokenize(info[field])
@@ -140,7 +140,7 @@ class PositionalIndex(object):
 
     def _extract_terms(self, documents):
         terms = []
-        for id, info in enumerate(documents, 1):
+        for id, info in documents.iteritems():
             for field in info.iterkeys():
                 if info[field]:
                     words = tokenize(info[field])
@@ -204,12 +204,18 @@ class IndexReader(object):
             last += curr
 
         return dec_postings
+
+    def _unique(self, seq):
+        seen = set()
+        return [x for x in seq if x not in seen and not seen.add(x)]
     
     def get_terms(self):
-        return [k.split('.')[0] for k in self._index.iterkeys()]
+        terms = (k.split('.')[0] for k in self._index.iterkeys())
+        return self._unique(terms)
 
     def get_fields(self):
-        return [k.split('.')[1] for k in self._index.iterkeys()]
+        fields = (k.split('.')[1] for k in self._index.iterkeys())
+        return self._unique(fields)
     
     def get_documents_number(self):
         return self._number_documents
