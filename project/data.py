@@ -6,7 +6,7 @@ from classifier.classifier import Classifier
 from crawler.crawler import crawl_domain
 from wrapper.wrapper import Wrapper, MovieInfo
 import utils
-from consts import CRAWLED_PAGES_PATH, CLASSIFIED_PAGES_PATH, EXTRACTED_INFO_PATH, DOCUMENTS_PATH, INDEX_PATH, DATA_DIR
+import consts
 
 
 def download_pages(out_path):
@@ -104,20 +104,20 @@ def create_documents(in_path, out_path):
 
 
 def create_data():
-    if not os.path.exists(DATA_DIR):
-        os.makedirs(DATA_DIR)
+    if not os.path.exists(consts.DATA_DIR):
+        os.makedirs(consts.DATA_DIR)
 
-    if not os.path.exists(CRAWLED_PAGES_PATH):
-        download_pages(CRAWLED_PAGES_PATH)
+    if not os.path.exists(consts.CRAWLED_PATH):
+        download_pages(consts.CRAWLED_PATH)
 
-    if not os.path.exists(CLASSIFIED_PAGES_PATH):
-        classify_pages(CRAWLED_PAGES_PATH, CLASSIFIED_PAGES_PATH)
+    if not os.path.exists(consts.CLASSIFIED_PATH):
+        classify_pages(consts.CRAWLED_PATH, consts.CLASSIFIED_PATH)
 
-    if not os.path.exists(EXTRACTED_INFO_PATH):
-        extract_all_info(CLASSIFIED_PAGES_PATH, EXTRACTED_INFO_PATH)
+    if not os.path.exists(consts.EXTRACTED_PATH):
+        extract_all_info(consts.CLASSIFIED_PATH, consts.EXTRACTED_PATH)
 
-    if not os.path.exists(DOCUMENTS_PATH):
-        create_documents(EXTRACTED_INFO_PATH, DOCUMENTS_PATH)
+    if not os.path.exists(consts.DOCUMENTS_PATH):
+        create_documents(consts.EXTRACTED_PATH, consts.DOCUMENTS_PATH)
 
 
 if __name__ == '__main__':

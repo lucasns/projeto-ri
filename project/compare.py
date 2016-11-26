@@ -15,7 +15,7 @@ from classifier.classifier import Classifier
 from crawler.crawler import crawl_domain
 from crawler.config import DOMAINS
 from wrapper.wrapper import Wrapper, MovieInfo
-from consts import RESULTS_DIR, DATA_DIR, CLASSIFIED_PAGES_PATH
+import consts
 from utils import read_file, read_file_multiple, save_csv
 from data import extract_all_info
 
@@ -56,10 +56,10 @@ def harvest_ratio(in_path, out_path, classifier):
 
 
 def compare_crawler():
-    heuristic_file = os.path.join(DATA_DIR, 'using-heuristic-pages.pickle')
-    bsf_file = os.path.join(DATA_DIR, 'bfs-pages.pickle')
-    hr_bfs = os.path.join(RESULTS_DIR, 'bfs_harvest_ratio_results.csv')
-    hr_heuristic = os.path.join(RESULTS_DIR, 'heuristic_harvest_ratio_results.csv')
+    heuristic_file = os.path.join(consts.DATA_DIR, 'using-heuristic-pages.pickle')
+    bsf_file = os.path.join(consts.DATA_DIR, 'bfs-pages.pickle')
+    hr_bfs = os.path.join(consts.RESULTS_DIR, 'bfs_harvest_ratio_results.csv')
+    hr_heuristic = os.path.join(consts.RESULTS_DIR, 'heuristic_harvest_ratio_results.csv')
 
     if not os.path.exists(heuristic_file):
         crawl(True, heuristic_file)
@@ -198,7 +198,7 @@ def compare_classifiers():
 
     print "Testing Bag of Words"
 
-    file_path = os.path.join(RESULTS_DIR, 'bag-of-words-results.csv')
+    file_path = os.path.join(consts.RESULTS_DIR, 'bag-of-words-results.csv')
 
     rows = [['Algorithm', 'Training Time', 'Accuracy', 'Precision', 'Recall', 'F1-Measure']]
 
@@ -215,7 +215,7 @@ def compare_classifiers():
 
     print "Testing TF-IDF"
 
-    file_path = os.path.join(RESULTS_DIR,  'tf-idf-resultss.csv')
+    file_path = os.path.join(consts.RESULTS_DIR,  'tf-idf-resultss.csv')
     rows = [['Algorithm', 'Training Time', 'Accuracy', 'Precision', 'Recall', 'F1-Measure']]
 
     features_train, features_test, labels_train, labels_test = tools.split_dataset(tfidf_vectors, Y)
@@ -293,14 +293,14 @@ def extraction_score(specresults, genresults):
 
 
 def compare_wrapper():
-    specific_path = os.path.join(DATA_DIR, "specific.pickle")
-    generic_path = os.path.join(DATA_DIR, "generic.pickle")
+    specific_path = os.path.join(consts.DATA_DIR, "specific.pickle")
+    generic_path = os.path.join(consts.DATA_DIR, "generic.pickle")
 
     if not os.path.exists(specific_path):
-        extract_all_info(CLASSIFIED_PAGES_PATH, specific_path)
+        extract_all_info(consts.CLASSIFIED_PATH, specific_path)
 
     if not os.path.exists(generic_path):
-        extract_all_info(CLASSIFIED_PAGES_PATH, generic_path)
+        extract_all_info(consts.CLASSIFIED_PATH, generic_path)
 
     specresults = read_file(specific_path)
     genresults = read_file(generic_path)
@@ -323,12 +323,12 @@ def compare_wrapper():
         rows.append(["", "", ""])
         rows.append(["", "", ""])
 
-    save_csv(os.path.join(RESULTS_DIR, "wrapper_results.csv"), rows)
+    save_csv(os.path.join(consts.RESULTS_DIR, "wrapper_results.csv"), rows)
 
 
 if __name__ == '__main__':
-    if not os.path.exists(RESULTS_DIR):
-        os.makedirs(RESULTS_DIR)
+    if not os.path.exists(consts.RESULTS_DIR):
+        os.makedirs(consts.RESULTS_DIR)
 
     compare_classifiers()
     compare_crawler()
