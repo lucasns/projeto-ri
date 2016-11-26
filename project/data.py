@@ -1,10 +1,11 @@
 import cPickle as pickle
+from collections import OrderedDict
 import os
 
 from classifier.classifier import Classifier
 from crawler.crawler import crawl_domain
 from wrapper.wrapper import Wrapper, MovieInfo
-from utils import read_file, read_file_multiple
+import utils
 from consts import CRAWLED_PAGES_PATH, CLASSIFIED_PAGES_PATH, EXTRACTED_INFO_PATH, DOCUMENTS_PATH, INDEX_PATH, DATA_DIR
 
 
@@ -16,7 +17,7 @@ def classify_pages(in_path, out_path):
     classifier = Classifier()
 
     with open(out_path, 'wb') as f:
-        for site, html in read_file_multiple(in_path):
+        for site, html in utils.read_file_multiple(in_path):
             if classifier.classify(html):
                 pickle.dump((site, html), f)
 
@@ -30,11 +31,76 @@ def extract_all_info(in_path, out_path, extract_type='specific'):
         extract_funtion = wrapper.extract_specific
 
     info_list = []
-    for site, html in read_file_multiple(in_path):
-        info_list.append(extract_funtion(html, site))
+    for site, html in utils.read_file_multiple(in_path):
+        info = extract_funtion(html, site)
+        if info.title is not None:  #Exclude movies without title
+            info_list.append(info)
     
     with open(out_path, 'wb') as f:
         pickle.dump(info_list, f, pickle.HIGHEST_PROTOCOL)
+
+
+def _format_runtime(site, runtime):
+    min_format = ['rottentomatoes', 'metacritic', 'allmovie', 'tribute']
+    hr_format = ['flixster', 'movies', 'imdb', 'boxofficemojo']
+    
+    converted = None
+                
+    if site in min_format:
+        converted = utils.convert_min(runtime)
+    elif site in hr_format:
+        time = utils.convert_hr_min(runtime)
+        converted = time if time > 0 else None
+    elif site == "yify":
+        full_time = utils.convert_hr_min_sec(runtime)
+        min_time = utils.convert_min(runtime)
+
+        if full_time > 0:
+            converted = full_time
+        elif min_time > 0:
+            converted = min_time
+        else:
+            converted = None
+    else:
+        converted = runtime
+
+    return converted
+
+
+def _create_document(info, attributes):
+    info = info._asdict()
+    doc = OrderedDict()
+    
+    doc['site'] = info['site']
+
+    for attr in attributes:
+        if info[attr] is not None:
+            if attr == 'genre' or attr == 'director':
+                doc[attr] = ', '.join(info[attr])
+            elif attr == 'date':
+                year = utils.convert_date(info['date'])[2]
+                doc['date'] = year if year is not None else None
+            elif attr == 'runtime':
+                doc['runtime'] = str(_format_runtime(info['site'], info['runtime']))
+            else:
+                doc[attr] = info[attr]
+        else:
+            doc[attr] = ""  # Substitute None for empty strings
+
+    return doc
+
+
+def create_documents(in_path, out_path):
+    attributes = ['title', 'genre', 'director', 'date', 'runtime']
+
+    documents = OrderedDict()
+
+    for id, info in enumerate(utils.read_file(in_path), 1):
+        documents[id] = _create_document(info, attributes)
+    
+    print documents
+    with open(out_path, 'wb') as f:
+        pickle.dump(documents, f)
 
 
 def create_data():
@@ -44,11 +110,14 @@ def create_data():
     if not os.path.exists(CRAWLED_PAGES_PATH):
         download_pages(CRAWLED_PAGES_PATH)
 
-    if not os.path.exists(CRAWLED_PAGES_PATH):
+    if not os.path.exists(CLASSIFIED_PAGES_PATH):
         classify_pages(CRAWLED_PAGES_PATH, CLASSIFIED_PAGES_PATH)
 
-    if not os.path.exists(CRAWLED_PAGES_PATH):
+    if not os.path.exists(EXTRACTED_INFO_PATH):
         extract_all_info(CLASSIFIED_PAGES_PATH, EXTRACTED_INFO_PATH)
+
+    if not os.path.exists(DOCUMENTS_PATH):
+        create_documents(EXTRACTED_INFO_PATH, DOCUMENTS_PATH)
 
 
 if __name__ == '__main__':
