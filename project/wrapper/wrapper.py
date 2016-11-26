@@ -34,6 +34,9 @@ class Wrapper(object):
             elif e is not None:
                 e = e.encode('utf-8')
 
+            if e == [] or e == "":
+                e = None
+
             r.append(e)
 
         return tuple(r)
