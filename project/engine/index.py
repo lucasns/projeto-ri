@@ -194,6 +194,9 @@ class IndexReader(object):
         self._number_documents = index[0]
 
     def _decompress(self, postings):
+        if not postings:
+            return []
+
         dec_postings = [postings[0]]
         last, _ = postings[0]
         
@@ -221,4 +224,4 @@ class IndexReader(object):
 
     def get_postings(self, field, term):
         key = term + '.' + field
-        return self._decompress(self._index[key])
+        return self._decompress(self._index.get(key, []))
