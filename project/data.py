@@ -5,6 +5,7 @@ import os
 from classifier.classifier import Classifier
 from crawler.crawler import crawl_domain
 from wrapper.wrapper import Wrapper, MovieInfo
+from engine.index import IndexWriter
 import utils
 import consts
 
@@ -103,6 +104,15 @@ def create_documents(in_path, out_path):
         pickle.dump(documents, f)
 
 
+def create_index(in_path, out_path):
+    writer = IndexWriter()
+    documents = utils.read_file(in_path)
+    for doc in documents.itervalues():
+        doc.pop('site', None)
+
+    writer.write_index(documents, out_path)
+
+
 def create_data():
     if not os.path.exists(consts.DATA_DIR):
         os.makedirs(consts.DATA_DIR)
@@ -118,6 +128,9 @@ def create_data():
 
     if not os.path.exists(consts.DOCUMENTS_PATH):
         create_documents(consts.EXTRACTED_PATH, consts.DOCUMENTS_PATH)
+
+    if not os.path.exists(consts.INDEX_PATH):
+        create_index(consts.DOCUMENTS_PATH, consts.INDEX_PATH)
 
 
 if __name__ == '__main__':
