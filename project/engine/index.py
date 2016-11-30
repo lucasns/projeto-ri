@@ -5,23 +5,19 @@ import re
 from stemming.porter2 import stem
 from stop_words import get_stop_words
 
-
-def tokenize(str):
-    stop_words = get_stop_words('english')
-    letters_only = re.sub("[^a-zA-Z0-9]", " ", str)
-    words = letters_only.lower().split()
-    words = [w for w in words if not w in stop_words]
-    words = [stem(w) for w in words]
-    return words
+from tokenizer import Tokenizer
 
 
 class MatrixTD(object):
+    def __init__(self):
+        self._tokenizer = Tokenizer(True, True)
+
     def _extract_terms(self, documents):
         terms = []
         for id, info in documents.iteritems():
             for field in info.iterkeys():
                 if info[field]:
-                    words = tokenize(info[field])
+                    words = self._tokenizer.tokenize(info[field])
                     for word in words:
                         full_word = word + '.' + field
                         pair = (full_word, id)
@@ -45,13 +41,14 @@ class MatrixTD(object):
 class BasicIndex(object):
     def __init__(self, use_compression):
         self.use_compression = use_compression
+        self._tokenizer = Tokenizer(True, True)
 
     def _extract_terms(self, documents=True):
         terms = []
         for id, info in documents.iteritems():
             for field in info.iterkeys():
                 if info[field]:
-                    words = tokenize(info[field])
+                    words = self._tokenizer.tokenize(info[field])
                     for word in words:
                         full_word = word + '.' + field
                         pair = (full_word, id)
@@ -88,13 +85,14 @@ class BasicIndex(object):
 class FrequencyIndex(object):
     def __init__(self, use_compression=True):
         self.use_compression = use_compression
+        self._tokenizer = Tokenizer(True, True)
 
     def _extract_terms(self, documents):
         terms = []
         for id, info in documents.iteritems():
             for field in info.iterkeys():
                 if info[field]:
-                    words = tokenize(info[field])
+                    words = self._tokenizer.tokenize(info[field])
                     for word in words:
                         full_word = word + '.' + field
                         pair = (full_word, (id, words.count(word)))
@@ -133,6 +131,7 @@ class FrequencyIndex(object):
 class PositionalIndex(object):
     def __init__(self, use_compression=True):
         self.use_compression = use_compression
+        self._tokenizer = Tokenizer(True, True)
 
     def _indices(self, tokens, word):
         return [i for i, x in enumerate(tokens) if x == word]
@@ -142,7 +141,7 @@ class PositionalIndex(object):
         for id, info in documents.iteritems():
             for field in info.iterkeys():
                 if info[field]:
-                    words = tokenize(info[field])
+                    words = self._tokenizer.tokenize(info[field])
                     for word in words:
                         full_word = word + '.' + field
                         pair = (full_word, (id, words.count(word), self._indices(words, word)))
