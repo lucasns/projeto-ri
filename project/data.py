@@ -36,7 +36,7 @@ def extract_all_info(in_path, out_path, extract_type='specific'):
         info = extract_funtion(html, site)
         if info.title is not None:  #Exclude movies without title
             info_list.append(info)
-    
+
     with open(out_path, 'wb') as f:
         pickle.dump(info_list, f, pickle.HIGHEST_PROTOCOL)
 
@@ -44,9 +44,9 @@ def extract_all_info(in_path, out_path, extract_type='specific'):
 def _format_runtime(site, runtime):
     min_format = ['rottentomatoes', 'metacritic', 'allmovie', 'tribute']
     hr_format = ['flixster', 'movies', 'imdb', 'boxofficemojo']
-    
+
     converted = None
-                
+
     if site in min_format:
         converted = utils.convert_min(runtime)
     elif site in hr_format:
@@ -71,7 +71,7 @@ def _format_runtime(site, runtime):
 def _create_document(info, attributes):
     info = info._asdict()
     doc = OrderedDict()
-    
+
     doc['site'] = info['site']
 
     for attr in attributes:
@@ -96,10 +96,9 @@ def create_documents(in_path, out_path):
 
     documents = OrderedDict()
 
-    for id, info in enumerate(utils.read_file(in_path), 1):
+    for id, info in enumerate(utils.read_file(in_path), 0):
         documents[id] = _create_document(info, attributes)
-    
-    print documents
+
     with open(out_path, 'wb') as f:
         pickle.dump(documents, f)
 
