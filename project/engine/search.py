@@ -99,9 +99,12 @@ class Search(object):
                     if self._tf_idf:
                         postings_list = self._index_reader.get_postings(f, t)
                         n = len(postings_list)
-                        idf = np.log10(np.true_divide(N, n))
-                        tf = 1 + np.log10(freq)
-                        W[(f, t)] = np.multiply(tf, idf)
+                        if n != 0:
+                            idf = np.log10(np.true_divide(N, n))
+                            tf = 1 + np.log10(freq)
+                            W[(f, t)] = np.multiply(tf, idf)
+                        else:
+                            W[(f, t)] = 0
                     else:
                         W[(f, t)] = 1
 
