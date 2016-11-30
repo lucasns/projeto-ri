@@ -1,6 +1,3 @@
-import os
-import sys
-import re
 import numpy as np
 from tokenizer import Tokenizer
 from collections import Counter
@@ -79,7 +76,7 @@ class Search(object):
         self._weights = TfIdf(index_reader) if tf_idf else NaiveWeights(index_reader)
 
     def _format_query(self, query):
-    	meaningful_words = self._tokenizer.tokenize(query)
+        meaningful_words = self._tokenizer.tokenize(query)
         freqs = Counter(meaningful_words)
         return freqs.items()
 
