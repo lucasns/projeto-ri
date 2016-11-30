@@ -133,7 +133,8 @@ class Search(object):
         for doc in xrange(N):
             scores[doc] = np.true_divide(scores[doc], lenghts[doc])
 
-        scores = sorted(scores.items(), key=lambda t: t[1], reverse=True)
+        items = filter(lambda t: t[1] > 0, scores.items())
+        scores = sorted(items, key=lambda t: t[1], reverse=True)
 
         return scores
 
