@@ -39,7 +39,7 @@ class MatrixTD(object):
 
 
 class BasicIndex(object):
-    def __init__(self, use_compression):
+    def __init__(self, use_compression, use_stemming=True, remove_stopwords=True):
         self.use_compression = use_compression
         self._tokenizer = Tokenizer(True, True)
 
@@ -83,7 +83,7 @@ class BasicIndex(object):
 
 
 class FrequencyIndex(object):
-    def __init__(self, use_compression=True):
+    def __init__(self, use_compression=True, use_stemming=True, remove_stopwords=True):
         self.use_compression = use_compression
         self._tokenizer = Tokenizer(True, True)
 
@@ -129,7 +129,7 @@ class FrequencyIndex(object):
 
 
 class PositionalIndex(object):
-    def __init__(self, use_compression=True):
+    def __init__(self, use_compression=True, use_stemming=True, remove_stopwords=True):
         self.use_compression = use_compression
         self._tokenizer = Tokenizer(True, True)
 
