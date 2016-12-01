@@ -1,16 +1,12 @@
 import cPickle as pickle
 from collections import OrderedDict
-import re
-
-from stemming.porter2 import stem
-from stop_words import get_stop_words
 
 from tokenizer import Tokenizer
 
 
 class MatrixTD(object):
-    def __init__(self):
-        self._tokenizer = Tokenizer(True, True)
+    def __init__(self, use_stemming=True, remove_stopwords=True):
+        self._tokenizer = Tokenizer(use_stemming, remove_stopwords)
 
     def _extract_terms(self, documents):
         terms = []
@@ -41,7 +37,7 @@ class MatrixTD(object):
 class BasicIndex(object):
     def __init__(self, use_compression, use_stemming=True, remove_stopwords=True):
         self.use_compression = use_compression
-        self._tokenizer = Tokenizer(True, True)
+        self._tokenizer = Tokenizer(use_stemming, remove_stopwords)
 
     def _extract_terms(self, documents=True):
         terms = []
@@ -85,7 +81,7 @@ class BasicIndex(object):
 class FrequencyIndex(object):
     def __init__(self, use_compression=True, use_stemming=True, remove_stopwords=True):
         self.use_compression = use_compression
-        self._tokenizer = Tokenizer(True, True)
+        self._tokenizer = Tokenizer(use_stemming, remove_stopwords)
 
     def _extract_terms(self, documents):
         terms = []
@@ -131,7 +127,7 @@ class FrequencyIndex(object):
 class PositionalIndex(object):
     def __init__(self, use_compression=True, use_stemming=True, remove_stopwords=True):
         self.use_compression = use_compression
-        self._tokenizer = Tokenizer(True, True)
+        self._tokenizer = Tokenizer(use_stemming, remove_stopwords)
 
     def _indices(self, tokens, word):
         return [i for i, x in enumerate(tokens) if x == word]
