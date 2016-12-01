@@ -48,22 +48,21 @@ def _format_runtime(site, runtime):
     converted = None
 
     if site in min_format:
-        converted = utils.convert_min(runtime)
+        converted = utils.MovieTime.convert_min(runtime)
     elif site in hr_format:
-        time = utils.convert_hr_min(runtime)
-        converted = time if time > 0 else None
+        converted = utils.MovieTime.convert_hr_min(runtime)
     elif site == "yify":
-        full_time = utils.convert_hr_min_sec(runtime)
-        min_time = utils.convert_min(runtime)
+        full_time = utils.MovieTime.convert_hr_min_sec(runtime)
+        min_time = utils.MovieTime.convert_min(runtime)
 
         if full_time > 0:
             converted = full_time
         elif min_time > 0:
             converted = min_time
         else:
-            converted = None
+            converted = utils.MovieTime(0)
     else:
-        converted = runtime
+        converted = utils.MovieTime(runtime)
 
     return converted
 
@@ -79,10 +78,11 @@ def _create_document(info, attributes):
             if attr == 'genre' or attr == 'director':
                 doc[attr] = ', '.join(info[attr])
             elif attr == 'date':
-                year = utils.convert_date(info['date'])[2]
-                doc['date'] = year if year is not None else None
+                year = utils.MovieDate.convert_date(info['date']).year
+                doc['date'] = year if year is not None else ""
             elif attr == 'runtime':
-                doc['runtime'] = str(_format_runtime(info['site'], info['runtime']))
+                min = _format_runtime(info['site'], info['runtime']).min
+                doc['runtime'] = str(min) if min > 0 else ""
             else:
                 doc[attr] = info[attr]
         else:
@@ -108,6 +108,10 @@ def create_index(in_path, out_path):
     documents = utils.read_file(in_path)
     for doc in documents.itervalues():
         doc.pop('site', None)
+
+        time = doc['runtime']
+        if time != "":
+            doc['runtime'] = utils.MovieTime(int(time)).quartile()
 
     writer.write_index(documents, out_path)
 
