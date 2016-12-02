@@ -2,6 +2,7 @@ import cPickle as pickle
 from collections import OrderedDict
 
 from tokenizer import Tokenizer
+from binary import write_index_binary, read_index_binary
 
 
 class MatrixTD(object):
@@ -179,14 +180,15 @@ class IndexWriter(object):
 
     def write_index(self, documents, file_path):
         index = self._index_type.create_index(documents)
+        
         with open(file_path, 'wb') as f:
-            pickle.dump((len(documents), index), f, pickle.HIGHEST_PROTOCOL)
+            write_index_binary(f, len(documents), index)
 
         
 class IndexReader(object):
-    def __init__(self, index):
-        self._index = index[1]
-        self._number_documents = index[0]
+    def __init__(self, index_path):
+        with open(index_path, 'rb') as f:
+            self._number_docs, self._index = read_index_binary(f)
 
     def _decompress(self, postings):
         if not postings:
@@ -215,7 +217,7 @@ class IndexReader(object):
         return self._unique(fields)
     
     def get_documents_number(self):
-        return self._number_documents
+        return self._number_docs
 
     def get_postings(self, field, term):
         key = term + '.' + field

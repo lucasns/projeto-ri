@@ -1,4 +1,5 @@
 import struct
+from collections import OrderedDict
 
 
 def to_byte_string(i):
@@ -87,7 +88,7 @@ def gamma_decode(byte_array):
     return int(number, 2)
 
 
-def encode_index(postings, encoding=1):
+def encode_postings(postings, encoding=1):
     compressed = []
 
     last = 0
@@ -171,6 +172,10 @@ def _read_gamma_code(file):
 
 
 def write_index_binary(file, num_docs, index, encoding=1):
+    for k, v in index.iteritems():
+        index[k] = encode_postings(v)
+
+    
     #N documents
     data = struct.pack('>i', num_docs)
     file.write(data)
@@ -214,12 +219,11 @@ def write_index_binary(file, num_docs, index, encoding=1):
 
   
 def read_index_binary(file):
-    index = {}
+    index = OrderedDict()
 
     # N documents
     data = file.read(4)
     num_docs = struct.unpack('>i', data)[0]
-    print num_docs
 
     # Index type
     # 0 == Basic, 1 == Frequency, 2 == Positional
