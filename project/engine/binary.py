@@ -1,3 +1,6 @@
+import struct
+
+
 def to_byte_string(i):
     binary = format(i, 'b')
     return binary.zfill(8)
@@ -82,3 +85,187 @@ def gamma_decode(byte_array):
 
     number = '1' + binary[offset_size + 1: 2 * offset_size + 1]
     return int(number, 2)
+
+
+def encode_index(postings, encoding=1):
+    compressed = []
+
+    last = 0
+    for i in xrange(len(postings)):
+        doc_id, freq = postings[i]
+        if encoding == 1:
+            code_id = vb_encode(doc_id)
+        elif encoding == 2:
+            code_id = gamma_encode(doc_id)
+        else:
+            code_id = doc_id
+
+        new = (code_id, freq)
+        compressed.append(new)
+        last = doc_id
+    
+    return compressed
+
+
+def _write_posting(file, p, encoding=1):
+    doc_id, freq = p
+    
+    if encoding != 0:
+        #ID
+        fmt = '>' + 'B' * len(doc_id)
+        data = struct.pack(fmt, *doc_id)
+        file.write(data)
+
+        #Freq
+        data = struct.pack('>i', freq)
+        file.write(data)
+    else:
+        data = struct.pack('>ii', doc_id, freq)
+        file.write(data)
+
+
+def _read_vb_code(file):
+    byte_array = []
+
+    while True:
+        data = file.read(1) # Read byte
+        byte = struct.unpack('B', data)[0]
+        byte_array.append(byte)
+
+        if to_byte_string(byte)[0] == '1':
+            break
+
+    return vb_decode(byte_array)
+
+
+def _read_gamma_code(file):
+    byte_array = []
+    num_bits = 0
+
+    end_unary = False
+    while not end_unary:
+        data = file.read(1) # Read byte
+        byte = struct.unpack('B', data)[0]
+
+        byte_string = to_byte_string(byte)
+        byte_array.append(byte)
+
+        for b in byte_string:
+            if b == '1':
+                num_bits += 1
+            else:
+                end_unary = True
+                break
+
+    rest = 8 - ((num_bits + 1) % 8)
+    bits_needed = num_bits - rest
+    bytes_needed = num_bytes_int(bits_needed)
+
+    # Add bytes to complete the offset
+    for i in xrange(bytes_needed):
+        data = file.read(1) # Read byte
+        byte = struct.unpack('B', data)[0]
+        byte_array.append(byte)
+
+    return gamma_decode(byte_array)
+
+
+def write_index_binary(file, num_docs, index, encoding=1):
+    #N documents
+    data = struct.pack('>i', num_docs)
+    file.write(data)
+
+    # Index type
+    # 0 == Basic, 1 == Frequency, 2 == Positional
+    data = struct.pack('B', 1)
+    file.write(data)
+
+    # Encoding
+    # 0 == Uncompressed, 1 == Variable Byte, 2 == Gamma
+    data = struct.pack('B', encoding)
+    file.write(data)
+
+    # N strings
+    strings = [k for k in index.iterkeys()]
+    num_strings = len(strings)
+    data = struct.pack('>i', num_strings)
+    file.write(data)
+
+    for s in strings:
+        # String length
+        str_length = len(s)
+        data = struct.pack('B', str_length)
+        file.write(data)
+
+        # String
+        fmt = str(str_length) + 's'
+        data = struct.pack(fmt, s)
+        file.write(data)
+
+        # N postings
+        postings = index[s]
+        num_postings = len(postings)
+        data = struct.pack('>i', num_postings)
+        file.write(data)
+
+        # Postings
+        for p in postings:
+            _write_posting(file, p, encoding)
+
+  
+def read_index_binary(file):
+    index = {}
+
+    # N documents
+    data = file.read(4)
+    num_docs = struct.unpack('>i', data)[0]
+    print num_docs
+
+    # Index type
+    # 0 == Basic, 1 == Frequency, 2 == Positional
+    data = file.read(1)
+    index_type = struct.unpack('B', data)[0]
+
+    # Encoding
+    # 0 == Uncompressed, 1 == Variable Byte, 2 == Gamma
+    data = file.read(1)
+    encoding = struct.unpack('B', data)[0]
+
+    # N strings
+    data = file.read(4)
+    num_strings = struct.unpack('>i', data)[0]
+
+    for i in xrange(num_strings):
+        # String length
+        data = file.read(1)
+        str_length = struct.unpack('B', data)[0]
+
+        # String
+        fmt = str(str_length) + 's'
+        data = file.read(str_length)
+        string = struct.unpack(fmt, data)[0]
+ 
+        # N postings
+        data = file.read(4)
+        num_postings = struct.unpack('>i', data)[0]
+
+        # Postings
+        postings = []
+        for i in xrange(num_postings):
+            #ID
+            if encoding == 1:
+                doc_id = _read_vb_code(file)
+            elif encoding == 2:
+                doc_id = _read_gamma_code(file)
+            else:
+                data = file.read(4)
+                doc_id = struct.unpack('>i', data)[0]
+
+            #Freq
+            data = file.read(4)
+            freq = struct.unpack('>i', data)[0]
+            postings.append((doc_id, freq))
+
+        index[string] = postings
+
+    return num_docs, index
