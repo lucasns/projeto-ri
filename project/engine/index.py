@@ -177,12 +177,18 @@ class PositionalIndex(object):
 class IndexWriter(object):
     def __init__(self, use_compression=True):
         self._index_type = FrequencyIndex(use_compression)
+        self.use_compression = use_compression
 
     def write_index(self, documents, file_path):
         index = self._index_type.create_index(documents)
         
         with open(file_path, 'wb') as f:
-            write_index_binary(f, len(documents), index)
+            if self.use_compression:
+                encoding = 1
+            else:
+                encoding = 0
+
+            write_index_binary(f, len(documents), index, encoding)
 
         
 class IndexReader(object):

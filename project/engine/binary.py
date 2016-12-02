@@ -173,7 +173,7 @@ def _read_gamma_code(file):
 
 def write_index_binary(file, num_docs, index, encoding=1):
     for k, v in index.iteritems():
-        index[k] = encode_postings(v)
+        index[k] = encode_postings(v, encoding)
 
     
     #N documents
@@ -182,7 +182,7 @@ def write_index_binary(file, num_docs, index, encoding=1):
 
     # Index type
     # 0 == Basic, 1 == Frequency, 2 == Positional
-    data = struct.pack('B', 1)
+    data = struct.pack('B', encoding)
     file.write(data)
 
     # Encoding
