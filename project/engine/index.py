@@ -10,13 +10,13 @@ class MatrixTD(object):
 
     def _extract_terms(self, documents):
         terms = []
-        for id, info in documents.iteritems():
+        for doc_id, info in documents.iteritems():
             for field in info.iterkeys():
                 if info[field]:
                     words = self._tokenizer.tokenize(info[field])
                     for word in words:
                         full_word = word + '.' + field
-                        pair = (full_word, id)
+                        pair = (full_word, doc_id)
                         if pair not in terms:
                             terms.append(pair)
 
@@ -25,10 +25,10 @@ class MatrixTD(object):
     def create_matrix(self, documents):
         terms = self._extract_terms(documents)
         matrix = OrderedDict()
-        for term, id in terms:
+        for term, doc_id in terms:
             matrix[term] = [0] * len(documents)
     
-        for term, id in terms:
+        for term, doc_id in terms:
             matrix[term][id-1] = 1
 
         return matrix
@@ -41,13 +41,13 @@ class BasicIndex(object):
 
     def _extract_terms(self, documents=True):
         terms = []
-        for id, info in documents.iteritems():
+        for doc_id, info in documents.iteritems():
             for field in info.iterkeys():
                 if info[field]:
                     words = self._tokenizer.tokenize(info[field])
                     for word in words:
                         full_word = word + '.' + field
-                        pair = (full_word, id)
+                        pair = (full_word, doc_id)
                         if pair not in terms:
                             terms.append(pair)
 
@@ -68,8 +68,8 @@ class BasicIndex(object):
         terms = self._extract_terms(documents)
 
         index = OrderedDict()
-        for term, id in terms:
-            index.setdefault(term, []).append(id)
+        for term, doc_id in terms:
+            index.setdefault(term, []).append(doc_id)
 
         if self.use_compression:
             for term, post in index.iteritems():
@@ -85,13 +85,13 @@ class FrequencyIndex(object):
 
     def _extract_terms(self, documents):
         terms = []
-        for id, info in documents.iteritems():
+        for doc_id, info in documents.iteritems():
             for field in info.iterkeys():
                 if info[field]:
                     words = self._tokenizer.tokenize(info[field])
                     for word in words:
                         full_word = word + '.' + field
-                        pair = (full_word, (id, words.count(word)))
+                        pair = (full_word, (doc_id, words.count(word)))
                         if pair not in terms:
                             terms.append(pair)
 
@@ -103,10 +103,10 @@ class FrequencyIndex(object):
         last, _ = postings[0]
     
         for i in xrange(1, len(postings)):
-            id, freq = postings[i]
-            new = (id - last, freq)
+            doc_id, freq = postings[i]
+            new = (doc_id - last, freq)
             compressed.append(new)
-            last = id
+            last = doc_id
     
         return compressed
 
@@ -114,8 +114,8 @@ class FrequencyIndex(object):
         terms = self._extract_terms(documents)
 
         index = OrderedDict()
-        for term, id in terms:
-            index.setdefault(term, []).append(id)
+        for term, doc_id in terms:
+            index.setdefault(term, []).append(doc_id)
 
         if self.use_compression:
             for term, post in index.iteritems():
@@ -134,13 +134,13 @@ class PositionalIndex(object):
 
     def _extract_terms(self, documents):
         terms = []
-        for id, info in documents.iteritems():
+        for doc_id, info in documents.iteritems():
             for field in info.iterkeys():
                 if info[field]:
                     words = self._tokenizer.tokenize(info[field])
                     for word in words:
                         full_word = word + '.' + field
-                        pair = (full_word, (id, words.count(word), self._indices(words, word)))
+                        pair = (full_word, (doc_id, words.count(word), self._indices(words, word)))
                         if pair not in terms:
                             terms.append(pair)
 
@@ -152,10 +152,10 @@ class PositionalIndex(object):
         last, _, _ = postings[0]
     
         for i in xrange(1, len(postings)):
-            id, freq, pos = postings[i]
-            new = (id - last, freq, pos)
+            doc_id, freq, pos = postings[i]
+            new = (doc_id - last, freq, pos)
             compressed.append(new)
-            last = id
+            last = doc_id
     
         return compressed
 
@@ -163,8 +163,8 @@ class PositionalIndex(object):
         terms = self._extract_terms(documents)
 
         index = OrderedDict()
-        for term, id in terms:
-            index.setdefault(term, []).append(id)
+        for term, doc_id in terms:
+            index.setdefault(term, []).append(doc_id)
 
         if self.use_compression:
             for term, post in index.iteritems():
