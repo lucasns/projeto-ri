@@ -14,6 +14,7 @@ import classifier.tools as tools
 from classifier.classifier import Classifier
 from crawler.crawler import crawl_domain
 from crawler.config import DOMAINS
+from engine.index import IndexWriter, IndexReader
 from wrapper.wrapper import Wrapper, MovieInfo
 import consts
 from utils import read_file, read_file_multiple, save_csv
@@ -326,10 +327,40 @@ def compare_wrapper():
     save_csv(os.path.join(consts.RESULTS_DIR, "wrapper_results.csv"), rows)
 
 
+def compare_index():
+    documents = read_file(consts.DOCUMENTS_PATH)
+    tmp_index = os.path.join(consts.DATA_DIR, 'tmp_index.bin')
+
+    rows = [["Data", "Size (KB)"]]
+
+    statinfo = os.stat(consts.DOCUMENTS_PATH)
+    size = int(statinfo.st_size/1024)
+    rows.append(["Documents Dict", size])
+
+    writer = IndexWriter(False)
+    writer.write_index(documents, tmp_index)
+
+    statinfo = os.stat(tmp_index)
+    size = int(statinfo.st_size/1024)
+    rows.append(["Index Uncompressed", size])
+
+    writer = IndexWriter(True)
+    writer.write_index(documents, tmp_index)
+
+    statinfo = os.stat(tmp_index)
+    size = int(statinfo.st_size/1024)
+    rows.append(["Index VB Encoded", size])
+    save_csv(os.path.join(consts.RESULTS_DIR, "index_results.csv"), rows)
+
+
 if __name__ == '__main__':
     if not os.path.exists(consts.RESULTS_DIR):
         os.makedirs(consts.RESULTS_DIR)
 
+    if not os.path.exists(consts.DATA_DIR):
+        os.makedirs(consts.DATA_DIR)
+
     compare_classifiers()
     compare_crawler()
     compare_wrapper()
+    compare_index()

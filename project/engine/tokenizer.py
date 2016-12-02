@@ -14,7 +14,7 @@ class Tokenizer(object):
             words = [w for w in words if not w in self._STOPWORDS]
 
         if self.use_stemming:
-            words = [self._stemmer.stem(w) for w in words]
+            words = [self._stemmer.stem(w).encode('utf-8') for w in words]
 
         return words
 
