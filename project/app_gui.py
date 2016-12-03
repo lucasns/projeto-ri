@@ -1,5 +1,4 @@
 from easygui import *
-import json
 from app import search
 
 
@@ -45,7 +44,7 @@ class Interface(object):
         result = ""
 
         for document in documents_list:
-            result = result + str(json.dumps(document, indent=1)) + "\n\n"
+            result = result + document + "\n\n"
 
         result = result.replace('"', '').replace('{', '').replace('}', '')
 

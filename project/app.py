@@ -8,13 +8,24 @@ import consts
 SEARCHER = Search(IndexReader(consts.INDEX_PATH))
 
 
+def format_document(doc):
+    doc_str = ""
+    for k, v in doc.iteritems():
+        if k == 'runtime' and v != "":
+            doc_str += k.title() + ": " + str(utils.MovieTime(int(v))) + '\n'
+        else:
+            doc_str += k.title() + ": " + v + '\n'
+
+    return doc_str
+
+
 def get_documents(id_list):
     '''list of ids -> list of documents'''
     documents = utils.read_file(consts.DOCUMENTS_PATH)
 
     docs_list = []
     for doc_id in id_list:
-        docs_list.append(documents[doc_id])
+        docs_list.append(format_document(documents[doc_id]))
 
     return docs_list
 
@@ -51,8 +62,7 @@ def main():
     print len(docs), "results"
 
     for doc in docs:
-        for k, v in doc.iteritems():
-            print k, ": ", v
+        print doc
         print
 
 
