@@ -196,6 +196,9 @@ class IndexReader(object):
         with open(index_path, 'rb') as f:
             self._number_docs, self._index = read_index_binary(f)
 
+        self.terms = self._unique((k.split('.')[0] for k in self._index.iterkeys()))
+        self.fields = self._unique((k.split('.')[1] for k in self._index.iterkeys()))
+
     def _decompress(self, postings):
         if not postings:
             return []
@@ -215,12 +218,10 @@ class IndexReader(object):
         return [x for x in seq if x not in seen and not seen.add(x)]
     
     def get_terms(self):
-        terms = (k.split('.')[0] for k in self._index.iterkeys())
-        return self._unique(terms)
+        return self.terms
 
     def get_fields(self):
-        fields = (k.split('.')[1] for k in self._index.iterkeys())
-        return self._unique(fields)
+        return self.fields
     
     def get_documents_number(self):
         return self._number_docs
