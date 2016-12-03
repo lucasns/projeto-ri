@@ -1,87 +1,58 @@
 from easygui import *
-import numpy as np 
+import numpy as np
 import json
 
 class Interface(object):
-    def __init__(self, database):
-        self._database = database #database.asdict()
+    def __init__(self, fields):
+        self.fields = fields
 
-    def _getQueryFromUser(self):
-        msg = "Search for movies"
+    def _get_query_from_user(self):
+        msg = "Search for Movies"
         title = "Search Engine Application"
-        fieldNames = ["Title", "Genre", "Director", "Date", "Runtime"]
-        fieldValues = multenterbox(msg, title, fieldNames)
+
+        field_names = map(lambda s: s.capitalize(), self.fields)
+        field_names = [x+' (Year)' if x=='Date' else x for x in field_names]
+
+        #runtime = int(raw_input("Runtime:\n0 - 0-1 hr\n1 - 1-2 hr\n2 - 2-3 hr\n3 - More than 4 hr\n4 - ANY\n"))
+
+        #if runtime >= 0 and runtime < 4:
+        #    runtime = utils.MovieTime(runtime * 60 + 1).quartile()
+        #else:
+        #    runtime = ""
+
+        field_values = multenterbox(msg, title, field_names)
 
         # make sure that none of the fields was left blank
-        while 1:
-            if fieldValues == None: 
+        while True:
+            if field_values == None:
                 break
-            
+
             errmsg = ""
-            oneFieldProvided = False
+            one_field_provided = False
 
-            for i in range(len(fieldNames)):
-              if fieldValues[i].strip() != "":
-                oneFieldProvided = True
-                break  
+            for i in range(len(field_names)):
+              if field_values[i].strip() != "":
+                one_field_provided = True
+                break
 
-            if oneFieldProvided: 
+            if one_field_provided:
                 break # no problems found
             else:
                 errmsg = "At least one field should be provided."
-            
-            fieldValues = multenterbox(errmsg, title, fieldNames, fieldValues)
 
-        dictList = zip(fieldNames, fieldValues)
-        result = dict(dictList)
+            field_values = multenterbox(errmsg, title, field_names, field_values)
+
+        dict_list = zip(self.fields, field_values)
+        result = dict(dict_list)
 
         return result
-        
-    def _showRetrievedDocuments(self, retrievedDocuments):
+
+    def _show_retrieved_documents(self, documents_list):
         result = ""
-        
-        for (document, rank) in retrievedDocuments:
-            result = result + str(json.dumps(self._database[document], indent=1)) + "\n\n"
-        
-        result = result.replace('"', '')
-        result = result.replace('{', '')
-        result = result.replace('}', '')
 
-        print(result)    
+        for document in documents_list:
+            result = result + str(json.dumps(document, indent=1)) + "\n\n"
 
-        textbox(str(len(retrievedDocuments)) + " results", "Retrieved Documents", result)
+        result = result.replace('"', '').replace('{', '').replace('}', '')
 
-        self._getQueryFromUser()
-
-    def _searcher(self):
-        query = myInterface._getQueryFromUser()
-        documentsList = retrieveDocuments(query)
-
-        myInterface._showRetrievedDocuments(documentsList)
-
-def retrieveDocuments(query):
-    return [(0, 5), (1, 4)]
-
-# Testing
-if __name__ == '__main__':
-
-    database = [{'Title': "The Lord of The Rings",
-                    'Genre': "Action & Adventure",
-                    'Director': "Peter Jackson",
-                    'Date': "01/01/2002",
-                    'Runtime': "165 minutes",
-                    'Website': "IMDB"},
-
-                {'Title': "The Matrix",
-                    'Genre': "Science Fiction",
-                    'Director': "The Wachowski Brothers",
-                    'Date': "31/03/1999",
-                    'Runtime': "136 minutes",
-                    'Website': "Rotten Tomato"}
-                ]
-
-    myInterface = Interface(database)
-    myInterface._searcher()
-    
-
-
+        textbox(str(len(documents_list)) + " results", "Retrieved Documents", result)
