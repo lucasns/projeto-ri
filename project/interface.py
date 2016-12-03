@@ -1,6 +1,7 @@
 from easygui import *
-import numpy as np
 import json
+from main import search
+
 
 class Interface(object):
     def __init__(self, fields):
@@ -12,13 +13,6 @@ class Interface(object):
 
         field_names = map(lambda s: s.capitalize(), self.fields)
         field_names = [x+' (Year)' if x=='Date' else x for x in field_names]
-
-        #runtime = int(raw_input("Runtime:\n0 - 0-1 hr\n1 - 1-2 hr\n2 - 2-3 hr\n3 - More than 4 hr\n4 - ANY\n"))
-
-        #if runtime >= 0 and runtime < 4:
-        #    runtime = utils.MovieTime(runtime * 60 + 1).quartile()
-        #else:
-        #    runtime = ""
 
         field_values = multenterbox(msg, title, field_names)
 
@@ -56,3 +50,16 @@ class Interface(object):
         result = result.replace('"', '').replace('{', '').replace('}', '')
 
         textbox(str(len(documents_list)) + " results", "Retrieved Documents", result)
+
+
+def run():
+    interface = Interface(["title", "genre", "director", "date", "runtime"])
+    while True:
+        query = interface._get_query_from_user()
+
+        documents_list = search(query)
+        interface._show_retrieved_documents(documents_list)
+
+
+if __name__ == '__main__':
+    run()
