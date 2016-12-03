@@ -1,6 +1,6 @@
 from easygui import *
 import json
-from main import search
+from app import search
 
 
 class Interface(object):
