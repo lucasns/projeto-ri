@@ -1,64 +1,106 @@
-from easygui import *
-from app import search
+from Tkinter import *
+import tkMessageBox
+from ScrolledText import ScrolledText
+from utils import MovieTime
+import app
 
+class App(Frame):
+    def __init__(self, master=None):
+        Frame.__init__(self, master)
+        
+        self.pack()
+        master.bind('<Return>', self.key_press)
 
-class Interface(object):
-    def __init__(self, fields):
-        self.fields = fields
+        self.message = Label(self, text=" Search for movies ", font=('Arial', '10'))
+        self.message.grid(row=0, column=2, padx=(0, 50), pady=(20, 20))
 
-    def _get_query_from_user(self):
-        msg = "Search for Movies"
-        title = "Search Engine Application"
+        self.title_entry_label = Label(self, text="Title: ")
+        self.title_entry_label.grid(row=1, column=1, padx=(0, 5), pady=(0,10), sticky=W)
 
-        field_names = map(lambda s: s.capitalize(), self.fields)
-        field_names = [x+' (Year)' if x=='Date' else x for x in field_names]
+        self.title_entry = Entry(self, width=50, font=1)
+        self.title_entry.grid(row=1, column=2, padx=(0, 20), pady=(0,10))
 
-        field_values = multenterbox(msg, title, field_names)
+        self.genre_entry_label = Label(self, text="Genre: ", justify=LEFT)
+        self.genre_entry_label.grid(row=3, column=1, padx=(0, 5), pady=(0,10), sticky=W)
 
-        # make sure that none of the fields was left blank
-        while True:
-            if field_values == None:
-                break
+        self.genre_entry = Entry(self, width=50, font=1)
+        self.genre_entry.grid(row=3, column=2, padx=(0, 20), pady=(0,10))
 
-            errmsg = ""
-            one_field_provided = False
+        self.director_entry_label = Label(self, text="Director: ", justify=LEFT)
+        self.director_entry_label.grid(row=4, column=1, padx=(0, 5), pady=(0,10), sticky=W)
 
-            for i in range(len(field_names)):
-              if field_values[i].strip() != "":
-                one_field_provided = True
-                break
+        self.director_entry = Entry(self, width=50, font=1)
+        self.director_entry.grid(row=4, column=2, padx=(0, 20), pady=(0,10))
 
-            if one_field_provided:
-                break # no problems found
-            else:
-                errmsg = "At least one field should be provided."
+        self.date_entry_label = Label(self, text="Date (Year): ", justify=LEFT)
+        self.date_entry_label.grid(row=5, column=1, padx=(0, 5), pady=(0,10), sticky=W)
 
-            field_values = multenterbox(errmsg, title, field_names, field_values)
+        self.date_entry = Entry(self, width=50, font=1)
+        self.date_entry.grid(row=5, column=2, padx=(0, 20), pady=(0,10))
 
-        dict_list = zip(self.fields, field_values)
-        result = dict(dict_list)
+        self.runtime_entry_label = Label(self, text="Runtime: ", justify=LEFT)
+        self.runtime_entry_label.grid(row=6, column=1, padx=(0, 5), pady=(0,10), sticky=W)
 
-        return result
+        self.runtime_var = StringVar(master)
+        self.runtime_var.set("None")
+        self.options = ["None", "Less than 1h", "Between 1h and 2h", "Between 2h and 3h", "More than 4h"]
+        self.runtime_entry = OptionMenu(self, self.runtime_var, *self.options)
+        self.runtime_entry.config(width=18)
+        self.runtime_entry.grid(row=6, column=2, padx=(0, 320))
 
-    def _show_retrieved_documents(self, documents_list):
-        result = ""
+        self.search_in_button = Button(self, text="Search", width=30, command=self.search_cmd)
+        self.search_in_button.grid(row=9, column=2, padx=(0, 50), pady=(30, 20))
+            
+    def key_press(self, event):
+        self.search_cmd()
 
-        for document in documents_list:
-            result = result + document + "\n\n"
+    def search_cmd(self):
+        query = {}
+        query['title'] = self.title_entry.get()
+        query['genre'] = self.genre_entry.get()
+        query['director'] = self.director_entry.get()
+        query['date'] = self.date_entry.get()
+        runtime = self.options.index(self.runtime_var.get()) * 60 - 1
 
-        result = result.replace('"', '').replace('{', '').replace('}', '')
+        query['runtime'] = MovieTime(runtime).quartile()
 
-        textbox(str(len(documents_list)) + " results", "Retrieved Documents", result)
+        is_empty = True
+        print query
 
+        for v in query.itervalues():
+            if v != "" and v != "None":
+                is_empty = False
 
-def run():
-    interface = Interface(["title", "genre", "director", "date", "runtime"])
-    while True:
-        query = interface._get_query_from_user()
+        self.runtime_var.get()
+        if is_empty:
+            tkMessageBox.showerror("Error", "At least one field should be provided.")
+        else:
+            docs = app.search(query)
 
-        documents_list = search(query)
-        interface._show_retrieved_documents(documents_list)
+            # Create results window
+            results_window = Toplevel(self)
+            results_window.resizable(width=False, height=False)
+            results_window.wm_title(str(len(docs)) + " Results")
+            results_window.focus_set()
+            
+            text = ScrolledText(results_window, width=60, height=40)
+            text.grid(padx=20, pady=20)
+
+            docs_str = ""
+
+            for doc in docs:
+                docs_str += doc + '\n\n'
+
+            docs_str = docs_str[:len(docs_str)-2]
+
+            text.insert(END, docs_str)
+
+            text.config(state=DISABLED)
 
 
 if __name__ == '__main__':
-    run()
+    root = Tk()
+    root.resizable(width=False, height=False)
+    myapp = App(root)
+    myapp.master.title("Search Engine Application")
+    myapp.mainloop()
