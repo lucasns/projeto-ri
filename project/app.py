@@ -25,7 +25,7 @@ def get_documents(id_list):
 
     docs_list = []
     for doc_id in id_list:
-        docs_list.append(format_document(documents[doc_id]))
+        docs_list.append("ID: %i\n%s" % (doc_id, format_document(documents[doc_id])))
 
     return docs_list
 
