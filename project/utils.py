@@ -40,13 +40,13 @@ class MovieTime(object):
     def quartile(self):
         qrt = ""
         if self.min >= 180:
-            qrt = "[3-n)"
+            qrt = "3n"
         elif self.min >= 120:
-            qrt = "[2-3)"
+            qrt = "23"
         elif self.min >= 60:
-            qrt = "[1-2)"
+            qrt = "12"
         elif self.min > 0:
-            qrt = "(0-1)"
+            qrt = "01"
         else:
             qrt = ""
 
